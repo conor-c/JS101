@@ -7,6 +7,7 @@
 // 5. Return the result to the user
 
 const readline = require('readline-sync');
+const messages = require('./calculator_messages.json');
 
 function prompt(message) {
   console.log(`=> ${message}`);
@@ -16,22 +17,22 @@ function invalidNumber(number) {
   return number.trimStart() === '' || Number.isNaN(Number(number));
 }
 
-prompt('Welcome to the Terminal Calculator\n');
+prompt(messages.welcome);
 
 function getNumbers() {
-  prompt("What's the first number?");
+  prompt(messages.number1);
   let number1 = readline.question();
 
   while (invalidNumber(number1)) {
-    prompt("Hmm... that doesn't look like a valid number.");
+    prompt(messages.invalidNumber);
     number1 = readline.question();
   }
 
-  prompt("What's the second number?");
+  prompt(messages.number2);
   let number2 = readline.question();
 
   while (invalidNumber(number2)) {
-    prompt("Hmm... that doesn't look like a valid number.");
+    prompt(messages.invalidNumber);
     number2 = readline.question();
   }
 
@@ -39,11 +40,11 @@ function getNumbers() {
 }
 
 function pickOperator() {
-  prompt('Great! What operation would you like to perform?\n1. Add 2. Subtract 3. Multiply 4. Divide');
+  prompt(messages.pickOperator);
   let operation = readline.question();
 
   while (!['1', '2', '3', '4'].includes(operation)) {
-    prompt("That is not a valid operation, please use 1, 2, 3, 4.");
+    prompt(messages.invalidOperator);
     operation = readline.question();
   }
   return operation;
@@ -68,14 +69,13 @@ function calculate() {
       output = Number(numbers[0]) / Number(numbers[1]);
       break;
   }
-
-  prompt(`The result is: ${output}\n`);
+  return output;
 }
 
 while (true) {
-  calculate();
-  prompt("Would you like to perform another calculation? (Y/N)");
+  prompt(messages.output + calculate());
+  prompt(messages.restart);
+
   let askToRestart = readline.question().toUpperCase();
   if (askToRestart !== 'Y') break;
 }
-
