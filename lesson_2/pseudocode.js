@@ -16,16 +16,16 @@
 // END
 
 
-// a function that takes an array of strings, 
+// a function that takes an array of strings,
 // and returns a string that is all those strings concatenated together
 //  get the array of strings, pass it as a parameter
 //  set a variable that we will use to hold the concatenated strings
 //  iterate over the array, adding each string to the end of the previous
 //  QUESTION: how do we want to concatenate the strings together?
 //    with a space inbetween, commas?
-//  after finishing passing over each array index, we return the concatenated variable
+//  after finishing passing over each array index, we return
 
-//a function that takes an array of integers, 
+//a function that takes an array of integers,
 //and returns a new array with every other element
 //  receive the array of integers
 //  set an empty array variable
