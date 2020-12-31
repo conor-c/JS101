@@ -7,7 +7,7 @@
 // 5. Return the result to the user
 
 const readline = require('readline-sync');
-const messages = require('./calculator_messages.json');
+const MESSAGES = require('./calculator_MESSAGES.json');
 
 function prompt(message) {
   console.log(`=> ${message}`);
@@ -17,22 +17,22 @@ function invalidNumber(number) {
   return number.trimStart() === '' || Number.isNaN(Number(number));
 }
 
-prompt(messages.welcome);
+prompt(MESSAGES.welcome);
 
 function getNumbers() {
-  prompt(messages.number1);
+  prompt(MESSAGES.number1);
   let number1 = readline.question();
 
   while (invalidNumber(number1)) {
-    prompt(messages.invalidNumber);
+    prompt(MESSAGES.invalidNumber);
     number1 = readline.question();
   }
 
-  prompt(messages.number2);
+  prompt(MESSAGES.number2);
   let number2 = readline.question();
 
   while (invalidNumber(number2)) {
-    prompt(messages.invalidNumber);
+    prompt(MESSAGES.invalidNumber);
     number2 = readline.question();
   }
 
@@ -40,11 +40,11 @@ function getNumbers() {
 }
 
 function pickOperator() {
-  prompt(messages.pickOperator);
+  prompt(MESSAGES.pickOperator);
   let operation = readline.question();
 
   while (!['1', '2', '3', '4'].includes(operation)) {
-    prompt(messages.invalidOperator);
+    prompt(MESSAGES.invalidOperator);
     operation = readline.question();
   }
   return operation;
@@ -73,8 +73,8 @@ function calculate() {
 }
 
 while (true) {
-  prompt(messages.output + calculate());
-  prompt(messages.restart);
+  prompt(MESSAGES.output + calculate());
+  prompt(MESSAGES.restart);
 
   let askToRestart = readline.question().toUpperCase();
   if (askToRestart !== 'Y') break;
