@@ -1,11 +1,22 @@
 {
-  "welcome" : "Welcome to the Terminal Calculator\n",
-  "number1" : "What's the first number?",
-  "number2" : "What's the second number?",
-  "invalidNumber" : "Hmm... that doesn't look like a valid number.",
-  "pickOperator" : "Great! What operation would you like to perform?\n1. Add 2. Subtract 3. Multiply 4. Divide",
-  "invalidOperator" : "That is not a valid operation, please use 1, 2, 3, 4.",
-  "output" : "The result is: ",
-  "restart" : "Would you like to perform another calculation? (Y/N)"
-
+  "en" : {
+    "welcome" : "Welcome to the Terminal Calculator\n",
+    "number1" : "What's the first number?",
+    "number2" : "What's the second number?",
+    "invalidNumber" : "Hmm... that doesn't look like a valid number.",
+    "pickOperator" : "Great! What operation would you like to perform?\n1. Add 2. Subtract 3. Multiply 4. Divide",
+    "invalidOperator" : "That is not a valid operation, please use 1, 2, 3, 4.",
+    "output" : "The result is: ",
+    "restart" : "Would you like to perform another calculation? (Y/N)"
+  },
+  "fr" : {
+    "welcome": "Bienvenue dans le calculateur de terminal \n",
+    "number1": "Quel est le premier chiffre?",
+    "number2": "Quel est le deuxième nombre?",
+    "invalidNumber": "Hmm ... cela ne ressemble pas à un nombre valide.",
+    "pickOperator": "Super! Quelle opération souhaitez-vous effectuer? \n1. Ajouter 2. Soustraire 3. Multiplier 4. Diviser",
+    "invalidOperator": "Ce n'est pas une opération valide, veuillez utiliser 1, 2, 3, 4.",
+    "output": "Le résultat est:",
+    "restart": "Souhaitez-vous effectuer un autre calcul? (Y/N)"
+  }
 }
