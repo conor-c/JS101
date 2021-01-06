@@ -14,10 +14,18 @@ function prompt(message) {
   console.log(`=> ${message}`);
 }
 
+function invalidNumber(number) {
+  return number.trimStart() === '' || Number.isNaN(Number(number));
+}
+
 while (true) {
   prompt('What is your loan amount?');
-  let loanAmount = readline.question().split(',');
-  loanAmount = parseFloat(loanAmount.join(''));
+  let loanAmount = readline.question().split(',').join('');
+
+  while (invalidNumber(loanAmount)) {
+    prompt('Please enter a valid number.');
+    loanAmount = readline.question().split(',').join('');
+  }
 
   prompt('What is your APR?');
   let monthlyInterestRate = (parseFloat(readline.question()) / 100) / 12;
@@ -40,6 +48,9 @@ while (true) {
 
 //THINGS TO DO
 //check if inputs from user is valid
+//  figure out why we can't use NUMBER on loanAmount and why it breaks invalidNumber
+//  Also currently something like 3.002 is accepted, can we invalidate or do we keep and treat as a comma?
+// if theres an edgecase of a period and a comma flipped, what do we do?
 //specify that months input should not include years
 //make sure user can't enter in a fraction for a year .toInt?
 //internationalize text with JSON file
