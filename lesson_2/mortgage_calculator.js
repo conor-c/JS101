@@ -1,20 +1,26 @@
+//test more
+//figure out a looping program
 const readline = require('readline-sync');
 
 function monthlyPayment(loanAmount, annualPercentageRate, loanDuration) {
   let monthlyInterestRate = (annualPercentageRate / 100) / 12;
-
   let monthlyInstallments = loanAmount * (monthlyInterestRate /
     (1 - Math.pow((1 + monthlyInterestRate), (-loanDuration))));
 
-  let totalInterestPayments = (monthlyInstallments * loanDuration) - loanAmount;
-  let totalPayment = monthlyInstallments * loanDuration;
-
   if (monthlyInterestRate === 0) {
     monthlyInstallments = loanAmount / loanDuration;
-    totalInterestPayments = 0;
-    totalPayment = loanAmount;
   }
-  return [monthlyInstallments, totalInterestPayments, totalPayment];
+  return Number(monthlyInstallments);
+}
+
+function totalInterestPayment(monthlyInstallments, loanDuration, loanAmount) {
+  let totalInterest = (monthlyInstallments * loanDuration) - loanAmount;
+  return Number(totalInterest);
+}
+
+function totalPayment(monthlyInstallments, loanDuration) {
+  let totalPaid = monthlyInstallments * loanDuration;
+  return Number(totalPaid);
 }
 
 function prompt(message) {
@@ -22,10 +28,12 @@ function prompt(message) {
 }
 
 function invalidNumber(number) {
-  return number.trimStart() === '' || Number.isNaN(Number(number));
+  return number.trimStart() === ''
+  || Number.isNaN(Number(number))
+  || (Number(number) < 0);
 }
 
-while (true) {
+function getValidLoanAmount() {
   prompt('What is your loan amount?');
   let loanAmount = readline.question().split(',').join('');
 
@@ -33,8 +41,10 @@ while (true) {
     prompt('Please enter a valid number.');
     loanAmount = readline.question().split(',').join('');
   }
-  loanAmount = Number(loanAmount);
+  return Number(loanAmount);
+}
 
+function getValidAPR() {
   prompt('What is your APR?');
   let annualPercentageRate = readline.question();
 
@@ -54,8 +64,10 @@ while (true) {
     prompt('What is your APR?');
     annualPercentageRate = readline.question();
   }
-  annualPercentageRate = Number(annualPercentageRate);
+  return Number(annualPercentageRate);
+}
 
+function getYearsDuration() {
   prompt('How many years is your loan for?');
   let loanYears = readline.question();
 
@@ -68,7 +80,10 @@ while (true) {
     prompt('Fractions of a year are not valid.');
     loanYears = 0;
   }
+  return Number(loanYears);
+}
 
+function getMonthsDuration() {
   prompt('How many months is your loan for?');
   let loanMonths = readline.question();
 
@@ -76,20 +91,40 @@ while (true) {
     prompt('Please enter a valid number.');
     loanMonths = readline.question();
   }
-  let loanDuration = (Number(loanYears) * 12) + Number(loanMonths);
+  return Number(loanMonths);
+}
 
-  if (loanDuration === 0) {
-    prompt('Please enter a nonzero loan term value.');
-    continue;
+function getValidLoanDuration() {
+  while (true) {
+    let loanYears = getYearsDuration();
+    let loanMonths = getMonthsDuration();
+    if (loanYears + loanMonths === 0) {
+      prompt('Please enter a positive value for loan duration.');
+      continue;
+    }
+    let loanDuration = (Number(loanYears) * 12) + Number(loanMonths);
+    return Number(loanDuration);
   }
+}
 
-  let results = monthlyPayment(loanAmount, annualPercentageRate, loanDuration);
-  prompt('Your monthly payments will be: $' + results[0].toFixed(2));
-  prompt('Your total paid over ' + loanDuration + ' months: $' + results[2].toFixed(2));
-  prompt('Your total interest is: $' + results[1].toFixed(2));
+function displayResults() {
+  let loanAmount = getValidLoanAmount();
+  let annualPercentageRate = getValidAPR();
+  let loanDuration = getValidLoanDuration();
+  let monthlyPayments = monthlyPayment(loanAmount, annualPercentageRate, loanDuration);
+  let totalPaid = totalPayment(monthlyPayments, loanDuration);
+  let interestPaid = totalInterestPayment(monthlyPayments, loanDuration, loanAmount);
 
+
+  prompt('Your monthly payments will be: $' + monthlyPayments.toFixed(2));
+  prompt('Your total paid over ' + loanDuration + ' months: $' + totalPaid.toFixed(2));
+  prompt('Your total interest is: $' + interestPaid.toFixed(2));
+}
+
+displayResults();
+/*
   prompt("Would you like to calculate another loan? Enter 'Y' or 'N'.");
   let restart = readline.question().toUpperCase();
   if (restart !== 'Y') break;
   console.clear();
-}
+*/
