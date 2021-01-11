@@ -1,5 +1,3 @@
-//test more
-//figure out a looping program
 const readline = require('readline-sync');
 
 function monthlyPayment(loanAmount, annualPercentageRate, loanDuration) {
