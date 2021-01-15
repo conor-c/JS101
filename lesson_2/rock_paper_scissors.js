@@ -22,25 +22,42 @@ function prompt(message) {
 
 function displayWinner(choice, computerChoice) {
   prompt(`You picked ${choice}, the computer picked ${computerChoice}.`);
-//CONT WORKING
-  if (WINNING_MOVES[choice]) {
+
+  if (WINNING_MOVES[choice].includes(computerChoice)) {
     prompt('You win!');
-  } else if (LOSING_MOVES) {
+  } else if (LOSING_MOVES[choice].includes(computerChoice)) {
     prompt('Computer Wins!');
   } else {
     prompt("It's a Tie!");
   }
 }
 
-while (true) {
+//WORK ON THIS
+function getChoice() {
   prompt(`Choose one: ${VALID_CHOICES.join(', ')}`);
   let choice = readline.question().toLowerCase();
+
+  if (choice.startsWith('r')) {
+    choice = 'rock';
+  } else if (choice.startsWith('p')) {
+    choice = 'paper';
+  } else if (choice.startsWith('sc')) {
+    choice = 'scissors';
+  } else if (choice.startsWith('sp')) {
+    choice = 'spock';
+  } else if (choice.startsWith('l')) {
+    choice = 'lizard';
+  }
 
   while (!VALID_CHOICES.includes(choice)) {
     prompt("That's not a valid choice.");
     choice = readline.question().toLowerCase();
   }
+  return choice;
+}
 
+while (true) {
+  let choice = getChoice();
   let randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
   let computerChoice = VALID_CHOICES[randomIndex];
 
@@ -48,7 +65,7 @@ while (true) {
 
   prompt('Want to play again? (y/n)');
   let answer = readline.question().toLowerCase();
-  while (answer[0] !== 'y' && answer[0] !== 'n') { //using the first character of answer incase they type the full word
+  while (answer[0] !== 'y' && answer[0] !== 'n') {
     prompt('Please enter "yes" or "no".');
     answer = readline.question().toLowerCase();
   }
