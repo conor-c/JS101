@@ -1,5 +1,8 @@
 const readline = require('readline-sync');
 const VALID_CHOICES = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
+let playerScore = 0;
+let computerScore = 0;
+const WINNING_SCORE = 5;
 const WINNING_MOVES = {
   rock: ['scissors', 'lizard'],
   paper: ['rock', 'spock'],
@@ -20,49 +23,55 @@ function prompt(message) {
   console.log(`=> ${message}`);
 }
 
+function calculateScore(choice, computerChoice) {
+  if (WINNING_MOVES[choice].includes(computerChoice)) {
+    playerScore += 1;
+  } else if (LOSING_MOVES[choice].includes(computerChoice)) {
+    computerScore += 1;
+  }
+}
+
 function displayWinner(choice, computerChoice) {
   prompt(`You picked ${choice}, the computer picked ${computerChoice}.`);
 
   if (WINNING_MOVES[choice].includes(computerChoice)) {
-    prompt('You win!');
+    prompt(`You win! You've won ${playerScore}/${WINNING_SCORE} times!`);
   } else if (LOSING_MOVES[choice].includes(computerChoice)) {
-    prompt('Computer Wins!');
+    prompt(`Computer Wins! Computer has won ${computerScore}/${WINNING_SCORE} times!`);
   } else {
     prompt("It's a Tie!");
   }
 }
 
-//WORK ON THIS
-function getChoice() {
-  prompt(`Choose one: ${VALID_CHOICES.join(', ')}`);
-  let choice = readline.question().toLowerCase();
-
-  if (choice.startsWith('r')) {
-    choice = 'rock';
-  } else if (choice.startsWith('p')) {
-    choice = 'paper';
-  } else if (choice.startsWith('sc')) {
-    choice = 'scissors';
-  } else if (choice.startsWith('sp')) {
-    choice = 'spock';
-  } else if (choice.startsWith('l')) {
-    choice = 'lizard';
-  }
-
-  while (!VALID_CHOICES.includes(choice)) {
-    prompt("That's not a valid choice.");
-    choice = readline.question().toLowerCase();
+function predictChoice(choice) {
+  if (choice.startsWith(VALID_CHOICES[0].slice(0, 1))) {
+    choice = VALID_CHOICES[0];
+  } else if (choice.startsWith(VALID_CHOICES[1].slice(0, 1))) {
+    choice = VALID_CHOICES[1];
+  } else if (choice.startsWith(VALID_CHOICES[2].slice(0, 2))) {
+    choice = VALID_CHOICES[2];
+  } else if (choice.startsWith(VALID_CHOICES[3].slice(0, 1))) {
+    choice = VALID_CHOICES[3];
+  } else if (choice.startsWith(VALID_CHOICES[4].slice(0, 2))) {
+    choice = VALID_CHOICES[4];
   }
   return choice;
 }
 
-while (true) {
-  let choice = getChoice();
-  let randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
-  let computerChoice = VALID_CHOICES[randomIndex];
+function getChoice() {
+  prompt(`Choose one: ${VALID_CHOICES.join(', ')}`);
+  let choice = readline.question().toLowerCase();
+  choice = predictChoice(choice);
 
-  displayWinner(choice, computerChoice);
+  while (!VALID_CHOICES.includes(choice)) {
+    prompt("That's not a valid choice.");
+    choice = readline.question().toLowerCase();
+    choice = predictChoice(choice);
+  }
+  return choice;
+}
 
+function playAgain() {
   prompt('Want to play again? (y/n)');
   let answer = readline.question().toLowerCase();
   while (answer[0] !== 'y' && answer[0] !== 'n') {
@@ -70,8 +79,26 @@ while (true) {
     answer = readline.question().toLowerCase();
   }
 
-  if (answer[0] !== 'y') {
-    break;
+  if (answer[0] === 'y') {
+    playerScore = 0;
+    computerScore = 0;
+    console.clear();
   }
-  console.clear();
+}
+
+while ((playerScore < WINNING_SCORE) && (computerScore < WINNING_SCORE)) {
+  let choice = getChoice();
+  let randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
+  let computerChoice = VALID_CHOICES[randomIndex];
+
+  calculateScore(choice, computerChoice);
+  displayWinner(choice, computerChoice);
+
+  if (playerScore === WINNING_SCORE) {
+    prompt('You are the Grand Winner!\n');
+    playAgain();
+  } else if (computerScore === WINNING_SCORE) {
+    prompt('Computer is the Grand Winner!\n');
+    playAgain();
+  }
 }
