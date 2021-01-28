@@ -44,3 +44,9 @@ function isOdd(integer) {
   }
   return true;
 }
+
+// Thoughts:
+// - We did not convert the input to an absolute value
+// - We could of easily done so with Math.abs();
+// - The problem did not explicity say to
+// - We did not need to because 0 === -0 in JS
