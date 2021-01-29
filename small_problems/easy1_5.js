@@ -53,13 +53,16 @@ function getUserInput() {
 
 function calculateTotalBill() {
   let usersBill = getUserInput();
+
   usersBill.tipAmount = usersBill.billAmount * usersBill.tipPercentage;
   usersBill.totalBill = usersBill.billAmount + usersBill.tipAmount;
+
   return usersBill;
 }
 
 function displayBill() {
   let totalBill = calculateTotalBill();
+
   console.log(`The tip is $${totalBill.tipAmount.toFixed(2)}`);
   console.log(`The total bill is $${totalBill.totalBill.toFixed(2)}`);
 }
