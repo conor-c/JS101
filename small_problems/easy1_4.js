@@ -36,10 +36,10 @@
 // 5. Return results from 3 and 4
 
 // Code
-const readline = require('readline-sync');
+let readline = require('readline-sync');
 
 function getUserInput() {
-  const roomSize = {};
+  let roomSize = {};
 
   console.log('Enter the length of the room in meters:');
   roomSize['length'] = readline.prompt();
@@ -63,7 +63,7 @@ function displayResult() {
   let roomArea = calculateArea();
 
   console.log(`The area of the room is ${roomArea.squareMeters} square meters.`);
-  console.log(`(${roomArea.squareFeet} square feet)`);
+  console.log(`(${roomArea.squareFeet.toFixed(2)} square feet)`);
 }
 
 displayResult();
