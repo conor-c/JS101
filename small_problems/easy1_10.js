@@ -68,3 +68,8 @@ function findMultiples(inputInteger) {
   multiplesOfThreeAndFive = multiplesOfThree.concat(multiplesOfFive);
   return multiplesOfThreeAndFive;
 }
+
+// Thoughts:
+// There was no real reason to push them into seperate arrays
+// or even push them into arrays at all. The solution I came up with is non
+// obvious, and hard to read what it does.
