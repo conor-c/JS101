@@ -2,6 +2,7 @@ const readline = require('readline-sync');
 const INITIAL_MARKER = ' ';
 const HUMAN_MARKER = 'X';
 const COMPUTER_MARKER = 'O';
+const SCORE_TO_WIN = 5;
 const WIN_CONDITIONS = [
   [1, 2, 3],
   [4, 5, 6],
@@ -18,7 +19,7 @@ function prompt(string) {
 }
 
 function displayBoard(board) { // expects an obj with 1-9 as keys and values as either O or X or ' '
-  console.clear();
+  // console.clear();
 
   prompt(`You are ${HUMAN_MARKER}. Computer is ${COMPUTER_MARKER}.`);
 
@@ -112,30 +113,67 @@ function detectWinner(board) {
   return null;
 }
 
-while (true) { // main game loop
-  let board = initalizeBoard(); // creates a fresh board
+function addScore(winner, objWithScore) {
+  if (winner === 'Player') {
+    objWithScore.playerScore += 1;
+  } else if (winner === 'Computer') {
+    objWithScore.computerScore += 1;
+  }
+}
 
-  while (true) { // game session loop
-    displayBoard(board);
+function initalizeScore() {
+  let score = {
+    playerScore: 0,
+    computerScore: 0,
+  };
+  return score;
+}
 
-    playerChoosesSquare(board);
-    if (someoneWon(board) || boardFull(board)) break;
+while (true) {
+  let score = initalizeScore(); // creates a fresh score
 
-    computerChoosesSquare(board);
-    if (someoneWon(board) || boardFull(board)) break;
+  while (true) { // main game loop
+    let board = initalizeBoard(); // creates a fresh board
+
+    while (true) { // game session loop
+      displayBoard(board);
+
+      playerChoosesSquare(board);
+      if (someoneWon(board) || boardFull(board)) break;
+
+      computerChoosesSquare(board);
+      if (someoneWon(board) || boardFull(board)) break;
+    }
+
+    displayBoard(board); // displays winning board-state
+
+    if (someoneWon(board)) { // declares end of game results
+      let winner = detectWinner(board);
+      addScore(winner, score);
+      prompt(`${winner} won this game!`);
+      prompt(`Current Player Score: ${score.playerScore}/${SCORE_TO_WIN}`);
+      prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
+    } else {
+      prompt("It's a tie!");
+    }
+
+    if (score.playerScore === 5) {
+      prompt(`You have won ${SCORE_TO_WIN} games and have won the match!`);
+      break;
+    } else if (score.computerScore === 5) {
+      prompt(`Sorry, the computer has won ${SCORE_TO_WIN} games and has won the match.`);
+      break;
+    }
   }
 
-  displayBoard(board); // displays winning board-state
-
-  if (someoneWon(board)) { // declares end of game results
-    prompt(`${detectWinner(board)} won!`);
-  } else {
-    prompt("It's a tie!");
-  }
-
-  prompt('Want to play again? (y or n)');
+  prompt('Want to play another match?(y or n)');
   let answer = readline.question().toLowerCase()[0]; //string lowercase, first character (Yasdgg) returns 'y'
   if (answer !== 'y') break; //if answer isn't y, end loop
 }
-
 prompt('Thanks for playing!'); // end of program
+
+// Problem
+// keep track of player and computer score
+// first to win 5 games, wins the match
+// score resets to 0 when a new match begins
+// no global variables
