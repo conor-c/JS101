@@ -43,8 +43,19 @@ function initalizeBoard() { // creates an object with 1-9 as keys, and ' ' as va
   for (let square = 1; square <= 9; square++) {
     board[String(square)] = INITIAL_MARKER;
   }
-
   return board;
+}
+
+function joinOr(arr, delimiter = ', ', joinWord = 'or') { //possible refactor to switch statement
+  let copyOfArr = [...arr];
+  if (copyOfArr.length === 0) return '';
+  if (copyOfArr.length === 1) return String(copyOfArr[0]);
+  if (copyOfArr.length > 1) {
+    if (copyOfArr.length === 2) return copyOfArr.join(` ${joinWord} `);
+    let lastElem = copyOfArr.pop();
+    return copyOfArr.join(delimiter) + delimiter + joinWord + ' ' + lastElem;
+  }
+  return copyOfArr;
 }
 
 function emptySquares(board) { // returns an array of unused possible moves
@@ -55,7 +66,7 @@ function playerChoosesSquare(board) { // expects an object with 1-9 keys
   let square; // so we can use square outside the loop
 
   while (true) {
-    prompt(`Choose a square (${emptySquares(board).join(', ')}):`);
+    prompt(`Choose a square (${joinOr(emptySquares(board))}):`);
     square = readline.question().trim();
 
     if (emptySquares(board).includes(square)) break;
@@ -98,7 +109,6 @@ function detectWinner(board) {
       return 'Computer';
     }
   }
-
   return null;
 }
 
