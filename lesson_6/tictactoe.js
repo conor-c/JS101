@@ -19,8 +19,7 @@ function prompt(string) {
 }
 
 function displayBoard(board) { // expects an obj with 1-9 as keys and values as either O or X or ' '
-  // console.clear();
-
+  console.clear();
   prompt(`You are ${HUMAN_MARKER}. Computer is ${COMPUTER_MARKER}.`);
 
   console.log('');
@@ -77,12 +76,30 @@ function playerChoosesSquare(board) { // expects an object with 1-9 keys
   board[square] = HUMAN_MARKER;
 }
 
-function computerChoosesSquare(board) {
-  let randomIdx = Math.floor(Math.random() * emptySquares(board).length);
+function computerChoosesSquare(board) { // computer won't make another move if if are satisfied
+  for (let line = 0; line < WIN_CONDITIONS.length; line++) {
+    let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
 
+    let alreadyPickedByPlayer = winCombo.filter(squareKey => { //an array of winning squareKeys that player has played on
+      return board[squareKey] === HUMAN_MARKER;
+    });
+
+    let possibleMove = winCombo.filter(squareKey => { // returns wincombo moves that haven't been picked by player
+      return !alreadyPickedByPlayer.includes(squareKey);
+    });
+
+    if (
+      alreadyPickedByPlayer.length === 2 &&
+      board[possibleMove] === INITIAL_MARKER) {
+      board[possibleMove] = COMPUTER_MARKER;
+      return;
+    }
+  }
+  let randomIdx = Math.floor(Math.random() * emptySquares(board).length);
   let square = emptySquares(board)[randomIdx];
   board[square] = COMPUTER_MARKER;
 }
+
 
 function boardFull(board) {
   return emptySquares(board).length === 0;
@@ -155,6 +172,8 @@ while (true) {
       prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
     } else {
       prompt("It's a tie!");
+      prompt(`Current Player Score: ${score.playerScore}/${SCORE_TO_WIN}`);
+      prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
     }
 
     if (score.playerScore === 5) {
@@ -164,16 +183,15 @@ while (true) {
       prompt(`Sorry, the computer has won ${SCORE_TO_WIN} games and has won the match.`);
       break;
     }
+
+    prompt("Type 'q' to give up the match early.");
+    prompt("Enter anything else to continue the match:");
+    let answer = readline.question().toLowerCase();
+    if (answer === 'q') break;
   }
 
   prompt('Want to play another match?(y or n)');
   let answer = readline.question().toLowerCase()[0]; //string lowercase, first character (Yasdgg) returns 'y'
   if (answer !== 'y') break; //if answer isn't y, end loop
 }
-prompt('Thanks for playing!'); // end of program
-
-// Problem
-// keep track of player and computer score
-// first to win 5 games, wins the match
-// score resets to 0 when a new match begins
-// no global variables
+prompt('Thanks for playing Tic-Tac-Toe!'); // end of program
