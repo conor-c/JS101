@@ -90,24 +90,32 @@ function findRisk(winCombo, board, marker) {
   return null; //if the last square in winCombo isn't empty, return null
 }
 
-function computerChoosesSquare(board) { // computer won't make another move if if are satisfied
-  let logicalChoice; // declare so it's outside of for loop scope
-
+function offenceAttempt(board) {
   for (let line = 0; line < WIN_CONDITIONS.length; line++) { // offence attempt
     let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
-    logicalChoice = findRisk(winCombo, board, COMPUTER_MARKER); //
-    if (logicalChoice) break;
+    let logicalChoice = findRisk(winCombo, board, COMPUTER_MARKER); //
+    if (logicalChoice) return logicalChoice;
+  }
+  return null;
+}
+
+function defenceAttempt(board) {
+  for (let line = 0; line < WIN_CONDITIONS.length; line++) { // defence attempt
+    let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
+    let logicalChoice = findRisk(winCombo, board, HUMAN_MARKER); //
+    if (logicalChoice) return logicalChoice;
+  }
+  return null;
+}
+
+function computerChoosesSquare(board) { // computer won't make another move if if are satisfied
+  let logicalChoice = offenceAttempt(board); // declare so it's outside of for loop scope
+
+  if (!logicalChoice) { // if no winning move is available, look for game saving moves
+    logicalChoice = defenceAttempt(board);
   }
 
-  if (!logicalChoice) {
-    for (let line = 0; line < WIN_CONDITIONS.length; line++) { // defence attempt
-      let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
-      logicalChoice = findRisk(winCombo, board, HUMAN_MARKER); //
-      if (logicalChoice) break;
-    }
-  }
-
-  if (!logicalChoice) {
+  if (!logicalChoice) { // if neither a winning, or a game saving move is available, randomly move
     let randomIdx = Math.floor(Math.random() * emptySquares(board).length);
     logicalChoice = emptySquares(board)[randomIdx];
   }
