@@ -19,7 +19,7 @@ function prompt(string) {
 }
 
 function displayBoard(board) { // expects an obj with 1-9 as keys and values as either O or X or ' '
-  console.clear();
+  // console.clear();
   prompt(`You are ${HUMAN_MARKER}. Computer is ${COMPUTER_MARKER}.`);
 
   console.log('');
@@ -76,28 +76,43 @@ function playerChoosesSquare(board) { // expects an object with 1-9 keys
   board[square] = HUMAN_MARKER;
 }
 
-function computerChoosesSquare(board) { // computer won't make another move if if are satisfied
-  for (let line = 0; line < WIN_CONDITIONS.length; line++) {
-    let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
+function findRisk(winCombo, board, marker) {
+  let comboState = winCombo.map(square => board[square]); // assigns the current values of the winCombo line
 
-    let alreadyPickedByPlayer = winCombo.filter(squareKey => { //an array of winning squareKeys that player has played on
-      return board[squareKey] === HUMAN_MARKER;
+  if (comboState.filter(val => val === marker).length === 2) {
+    let comboFinisher = winCombo.find(square => {
+      return board[square] === INITIAL_MARKER;
     });
-
-    let possibleMove = winCombo.filter(squareKey => { // returns wincombo moves that haven't been picked by player
-      return !alreadyPickedByPlayer.includes(squareKey);
-    });
-
-    if (
-      alreadyPickedByPlayer.length === 2 &&
-      board[possibleMove] === INITIAL_MARKER) {
-      board[possibleMove] = COMPUTER_MARKER;
-      return;
+    if (comboFinisher !== undefined) {
+      return comboFinisher;
     }
   }
-  let randomIdx = Math.floor(Math.random() * emptySquares(board).length);
-  let square = emptySquares(board)[randomIdx];
-  board[square] = COMPUTER_MARKER;
+  return null; //if the last square in winCombo isn't empty, return null
+}
+
+function computerChoosesSquare(board) { // computer won't make another move if if are satisfied
+  let logicalChoice; // declare so it's outside of for loop scope
+
+  for (let line = 0; line < WIN_CONDITIONS.length; line++) { // offence attempt
+    let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
+    logicalChoice = findRisk(winCombo, board, COMPUTER_MARKER); //
+    if (logicalChoice) break;
+  }
+
+  if (!logicalChoice) {
+    for (let line = 0; line < WIN_CONDITIONS.length; line++) { // defence attempt
+      let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
+      logicalChoice = findRisk(winCombo, board, HUMAN_MARKER); //
+      if (logicalChoice) break;
+    }
+  }
+
+  if (!logicalChoice) {
+    let randomIdx = Math.floor(Math.random() * emptySquares(board).length);
+    logicalChoice = emptySquares(board)[randomIdx];
+  }
+
+  board[logicalChoice] = COMPUTER_MARKER;
 }
 
 
