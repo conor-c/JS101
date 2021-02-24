@@ -115,6 +115,12 @@ function computerChoosesSquare(board) { // computer won't make another move if i
     logicalChoice = defenceAttempt(board);
   }
 
+  if (!logicalChoice) { // if no winning move, and no defending move is available, pick center tile
+    if (board[5] !== HUMAN_MARKER) {
+      logicalChoice = 5;
+    }
+  }
+
   if (!logicalChoice) { // if neither a winning, or a game saving move is available, randomly move
     let randomIdx = Math.floor(Math.random() * emptySquares(board).length);
     logicalChoice = emptySquares(board)[randomIdx];
