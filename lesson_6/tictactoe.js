@@ -46,7 +46,7 @@ function initalizeBoard() {
   return board;
 }
 
-function joinOr(arr, delimiter = ', ', joinWord = 'or') { //possible refactor to switch statement
+function joinOr(arr, delimiter = ', ', joinWord = 'or') {
   switch (arr.length) {
     case 0:
       return '';
@@ -57,22 +57,14 @@ function joinOr(arr, delimiter = ', ', joinWord = 'or') { //possible refactor to
     default:
       return arr.slice(0, arr.length - 1).join(delimiter) + delimiter + joinWord + ' ' + arr[arr.length - 1];
   }
-  // if (copyOfArr.length === 0) return '';
-  // if (copyOfArr.length === 1) return String(copyOfArr[0]);
-  // if (copyOfArr.length > 1) {
-  //   if (copyOfArr.length === 2) return copyOfArr.join(` ${joinWord} `);
-  //   let lastElem = copyOfArr.pop();
-  //   return copyOfArr.join(delimiter) + delimiter + joinWord + ' ' + lastElem;
-  // }
-  // return copyOfArr;
 }
 
-function emptySquares(board) { // returns an array of unused possible moves
+function emptySquares(board) {
   return Object.keys(board).filter(key => board[key] === INITIAL_MARKER);
 }
 
-function playerChoosesSquare(board) { // expects an object with 1-9 keys
-  let square; // so we can use square outside the loop
+function playerChoosesSquare(board) {
+  let square;
 
   while (true) {
     prompt(`Choose a square (${joinOr(emptySquares(board))}):`);
@@ -84,32 +76,32 @@ function playerChoosesSquare(board) { // expects an object with 1-9 keys
   board[square] = HUMAN_MARKER;
 }
 
-function findRisk(winCombo, board, marker) {
-  let comboState = winCombo.map(square => board[square]); // assigns the current values of the winCombo line
+function findRisk(winCombo, board, marker) { // marker will refer to player or human moves that have been played
+  let comboState = winCombo.map(square => board[square]); // assigns the current values of the given winCombo line
 
-  if (comboState.filter(val => val === marker).length === 2) {
-    let comboFinisher = winCombo.find(square => {
-      return board[square] === INITIAL_MARKER;
+  if (comboState.filter(val => val === marker).length === 2) { // checking if the winning line already has two of a specific marker
+    let comboFinisher = winCombo.find(square => { // checking if the remaining square is empty
+      return board[square] === INITIAL_MARKER; // if true, comboFinisher is assigned that value, assigned undefined otherwise
     });
     if (comboFinisher !== undefined) {
       return comboFinisher;
     }
   }
-  return null; //if the last square in winCombo isn't empty, return null
+  return null; // if the last square in winCombo isn't empty
 }
 
 function offenceAttempt(board) {
-  for (let line = 0; line < WIN_CONDITIONS.length; line++) { // offence attempt
-    let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
-    let logicalChoice = findRisk(winCombo, board, COMPUTER_MARKER); //
+  for (let line = 0; line < WIN_CONDITIONS.length; line++) {
+    let winCombo = WIN_CONDITIONS[line];
+    let logicalChoice = findRisk(winCombo, board, COMPUTER_MARKER);
     if (logicalChoice) return logicalChoice;
   }
   return null;
 }
 
 function defenceAttempt(board) {
-  for (let line = 0; line < WIN_CONDITIONS.length; line++) { // defence attempt
-    let winCombo = WIN_CONDITIONS[line]; // an array of keys that together, win
+  for (let line = 0; line < WIN_CONDITIONS.length; line++) {
+    let winCombo = WIN_CONDITIONS[line];
     let logicalChoice = findRisk(winCombo, board, HUMAN_MARKER); //
     if (logicalChoice) return logicalChoice;
   }
@@ -123,13 +115,13 @@ function computerChoosesSquare(board) {
     logicalChoice = defenceAttempt(board);
   }
 
-  if (!logicalChoice) { // if no winning move, and no game saving move is available, pick center tile
+  if (!logicalChoice) { // if no winning move, and no game saving move is available, pick center tile if empty
     if (board[5] === INITIAL_MARKER) {
       logicalChoice = 5;
     }
   }
 
-  if (!logicalChoice) { // if neither a winning, or a game saving move is available, randomly move
+  if (!logicalChoice) { // if neither a winning, or a game saving move is available, and center is taken, randomly move
     let randomIdx = Math.floor(Math.random() * emptySquares(board).length);
     logicalChoice = emptySquares(board)[randomIdx];
   }
@@ -198,7 +190,6 @@ function getWhoMovesFirst () {
         prompt('Not a valid entry.');
     }
   }
-
 }
 
 function restartGame() {
@@ -231,7 +222,7 @@ function alternatePlayer(currentPlayer) {
 
 while (true) { //new match / running loop
   let score = initalizeScore(); // creates a fresh score
-  const whoMovesFirst = getWhoMovesFirst(); // declared here so we can reset on match repeat
+  const whoMovesFirst = getWhoMovesFirst(); // declared here so we can ask again on match restart
 
   while (true) { // main game loop
     let board = initalizeBoard(); // creates a fresh board
