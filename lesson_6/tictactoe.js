@@ -47,15 +47,24 @@ function initalizeBoard() {
 }
 
 function joinOr(arr, delimiter = ', ', joinWord = 'or') { //possible refactor to switch statement
-  let copyOfArr = [...arr];
-  if (copyOfArr.length === 0) return '';
-  if (copyOfArr.length === 1) return String(copyOfArr[0]);
-  if (copyOfArr.length > 1) {
-    if (copyOfArr.length === 2) return copyOfArr.join(` ${joinWord} `);
-    let lastElem = copyOfArr.pop();
-    return copyOfArr.join(delimiter) + delimiter + joinWord + ' ' + lastElem;
+  switch (arr.length) {
+    case 0:
+      return '';
+    case 1:
+      return String(arr[0]);
+    case 2:
+      return arr.join(` ${joinWord} `);
+    default:
+      return arr.slice(0, arr.length - 1).join(delimiter) + delimiter + joinWord + ' ' + arr[arr.length - 1];
   }
-  return copyOfArr;
+  // if (copyOfArr.length === 0) return '';
+  // if (copyOfArr.length === 1) return String(copyOfArr[0]);
+  // if (copyOfArr.length > 1) {
+  //   if (copyOfArr.length === 2) return copyOfArr.join(` ${joinWord} `);
+  //   let lastElem = copyOfArr.pop();
+  //   return copyOfArr.join(delimiter) + delimiter + joinWord + ' ' + lastElem;
+  // }
+  // return copyOfArr;
 }
 
 function emptySquares(board) { // returns an array of unused possible moves
