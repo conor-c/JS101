@@ -18,8 +18,8 @@ function prompt(string) {
   console.log(`=> ${string}`);
 }
 
-function displayBoard(board) { // expects an obj with 1-9 as keys and values as either O or X or ' '
-  // console.clear();
+function displayBoard(board) {
+  console.clear();
   prompt(`You are ${HUMAN_MARKER}. Computer is ${COMPUTER_MARKER}.`);
 
   console.log('');
@@ -37,7 +37,7 @@ function displayBoard(board) { // expects an obj with 1-9 as keys and values as 
   console.log('');
 }
 
-function initalizeBoard() { // creates an object with 1-9 as keys, and ' ' as values
+function initalizeBoard() {
   let board = {};
 
   for (let square = 1; square <= 9; square++) {
@@ -70,7 +70,6 @@ function playerChoosesSquare(board) { // expects an object with 1-9 keys
     square = readline.question().trim();
 
     if (emptySquares(board).includes(square)) break;
-
     prompt("Sorry, that's not a valid choice.");
   }
   board[square] = HUMAN_MARKER;
@@ -108,15 +107,15 @@ function defenceAttempt(board) {
   return null;
 }
 
-function computerChoosesSquare(board) { // computer won't make another move if if are satisfied
-  let logicalChoice = offenceAttempt(board); // declare so it's outside of for loop scope
+function computerChoosesSquare(board) {
+  let logicalChoice = offenceAttempt(board);
 
   if (!logicalChoice) { // if no winning move is available, look for game saving moves
     logicalChoice = defenceAttempt(board);
   }
 
-  if (!logicalChoice) { // if no winning move, and no defending move is available, pick center tile
-    if (board[5] !== HUMAN_MARKER) {
+  if (!logicalChoice) { // if no winning move, and no game saving move is available, pick center tile
+    if (board[5] === INITIAL_MARKER) {
       logicalChoice = 5;
     }
   }
@@ -175,22 +174,65 @@ function initalizeScore() {
   return score;
 }
 
-while (true) {
+function getWhoMovesFirst () {
+  prompt('A new match of Tic-Tac-Toe will begin.');
+
+  while (true) {
+    prompt('Would you like to move first? (y/n)');
+    let firstMove = readline.question().toLowerCase();
+    switch (firstMove) {
+      case 'y':
+        return 'Player';
+      case 'n':
+        return 'Computer';
+      default:
+        prompt('Not a valid entry.');
+    }
+  }
+
+}
+
+function restartGame() {
+  prompt('Want to play another match? (y/n):');
+  while (true) {
+    let answer = readline.question().toLowerCase();
+    if (answer === 'y') return true;
+    if (answer === 'n') return false;
+    prompt('Not a valid input.');
+  }
+}
+
+function turnTaker (board, currentPlayer) {
+  switch (currentPlayer) {
+    case 'Player':
+      displayBoard(board);
+      playerChoosesSquare(board);
+      break;
+    case 'Computer':
+      computerChoosesSquare(board);
+      break;
+  }
+}
+
+function alternatePlayer(currentPlayer) {
+  if (currentPlayer === 'Player') return 'Computer';
+  if (currentPlayer === 'Computer') return 'Player';
+  return null; // unnessessary
+}
+
+while (true) { //new match / running loop
   let score = initalizeScore(); // creates a fresh score
+  const whoMovesFirst = getWhoMovesFirst(); // declared here so we can reset on match repeat
 
   while (true) { // main game loop
     let board = initalizeBoard(); // creates a fresh board
+    let currentPlayer = whoMovesFirst;
 
     while (true) { // game session loop
-      displayBoard(board);
-
-      playerChoosesSquare(board);
-      if (someoneWon(board) || boardFull(board)) break;
-
-      computerChoosesSquare(board);
+      turnTaker(board, currentPlayer);
+      currentPlayer = alternatePlayer(currentPlayer);
       if (someoneWon(board) || boardFull(board)) break;
     }
-
     displayBoard(board); // displays winning board-state
 
     if (someoneWon(board)) { // declares end of game results
@@ -219,8 +261,7 @@ while (true) {
     if (answer === 'q') break;
   }
 
-  prompt('Want to play another match?(y or n)');
-  let answer = readline.question().toLowerCase()[0]; //string lowercase, first character (Yasdgg) returns 'y'
-  if (answer !== 'y') break; //if answer isn't y, end loop
+  let restart = restartGame();
+  if (!restart) break;
 }
-prompt('Thanks for playing Tic-Tac-Toe!'); // end of program
+prompt('Thanks for playing Tic-Tac-Toe!');
