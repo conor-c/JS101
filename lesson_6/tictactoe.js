@@ -220,11 +220,33 @@ function alternatePlayer(currentPlayer) {
   return null; // unnessessary
 }
 
+function updateAndDisplayGameResults(board, score) {
+  displayBoard(board);
+  if (someoneWon(board)) {
+    let winner = detectWinner(board);
+    addScore(winner, score);          // MODIFIES THE SCORE OBJECT ARGUEMENT BEING PASSED IN
+    prompt(`${winner} won this game!`);
+    prompt(`Current Player Score: ${score.playerScore}/${SCORE_TO_WIN}`);
+    prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
+  } else {
+    prompt("It's a tie!");
+    prompt(`Current Player Score: ${score.playerScore}/${SCORE_TO_WIN}`);
+    prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
+  }
+}
+
+function getConcedeAnswer() {
+  prompt("Type 'q' to give up the match early.");
+  prompt("Enter anything else to continue the match:");
+  let answer = readline.question().toLowerCase();
+  return answer;
+}
+
 while (true) { //new match / running loop
   let score = initalizeScore(); // creates a fresh score
   const whoMovesFirst = getWhoMovesFirst(); // declared here so we can ask again on match restart
 
-  while (true) { // main game loop
+  while (true) { // match loop
     let board = initalizeBoard(); // creates a fresh board
     let currentPlayer = whoMovesFirst;
 
@@ -233,19 +255,8 @@ while (true) { //new match / running loop
       currentPlayer = alternatePlayer(currentPlayer);
       if (someoneWon(board) || boardFull(board)) break;
     }
-    displayBoard(board); // displays winning board-state
 
-    if (someoneWon(board)) { // declares end of game results
-      let winner = detectWinner(board);
-      addScore(winner, score);
-      prompt(`${winner} won this game!`);
-      prompt(`Current Player Score: ${score.playerScore}/${SCORE_TO_WIN}`);
-      prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
-    } else {
-      prompt("It's a tie!");
-      prompt(`Current Player Score: ${score.playerScore}/${SCORE_TO_WIN}`);
-      prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
-    }
+    updateAndDisplayGameResults(board, score); // consider refacoring function, too many side effects
 
     if (score.playerScore === 5) {
       prompt(`You have won ${SCORE_TO_WIN} games and have won the match!`);
@@ -255,10 +266,8 @@ while (true) { //new match / running loop
       break;
     }
 
-    prompt("Type 'q' to give up the match early.");
-    prompt("Enter anything else to continue the match:");
-    let answer = readline.question().toLowerCase();
-    if (answer === 'q') break;
+    let matchForfeit = getConcedeAnswer();
+    if (matchForfeit === 'q') break;
   }
 
   let restart = restartGame();
