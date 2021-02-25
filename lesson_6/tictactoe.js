@@ -215,9 +215,7 @@ function turnTaker (board, currentPlayer) {
 }
 
 function alternatePlayer(currentPlayer) {
-  if (currentPlayer === 'Player') return 'Computer';
-  if (currentPlayer === 'Computer') return 'Player';
-  return null; // unnessessary
+  return currentPlayer === 'Player' ? 'Computer' : 'Player';
 }
 
 function updateAndDisplayGameResults(board, score) {
