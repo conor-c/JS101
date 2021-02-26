@@ -24,7 +24,7 @@
 // DATA STRUCTURE:
 const readline = require('readline-sync');
 
-let deck = {
+const FULL_DECK = {
   2: ['hearts', 'diamonds', 'clubs', 'spades'],
   3: ['hearts', 'diamonds', 'clubs', 'spades'],
   4: ['hearts', 'diamonds', 'clubs', 'spades'],
@@ -40,7 +40,7 @@ let deck = {
   ace: ['hearts', 'diamonds', 'clubs', 'spades'],
 };
 
-let playerHand = {
+const EMPTY_HAND = {
   2: [],
   3: [],
   4: [],
@@ -56,23 +56,7 @@ let playerHand = {
   ace: [],
 };
 
-let dealerHand = {
-  2: [],
-  3: [],
-  4: [],
-  5: [],
-  6: [],
-  7: [],
-  8: [],
-  9: [],
-  10: [],
-  jack: [],
-  queen: [],
-  king: [],
-  ace: [],
-};
-
-function randomCard(deck) { // SIDE EFFECT, EDITS THE DECK OBJECT
+function randomCard(deck) { // SIDE EFFECT, WILL MUTATE DECK OBJECT
   let availableCardValues = Object.keys(deck).filter(key => { // all deck keys that still have arrays with suits in them
     return deck[key].length >= 1;
   });
@@ -89,15 +73,14 @@ function randomCard(deck) { // SIDE EFFECT, EDITS THE DECK OBJECT
   return [nameOfRandomKey, nameOfRandomSuit];
 }
 
-function hitPlayer (deck) {
+function hitPlayer (deck, playerHand) {
   let [ cardValue, cardSuit ] = randomCard(deck);
-  playerHand[cardValue].push(cardSuit); // adds the card to the playerHand
-  // console.log(`You are dealt the "${cardValue} of ${cardSuit}".`);
+  return playerHand[cardValue].push(cardSuit); // adds the card to the playerHand
 }
 
-function hitDealer (deck) {
+function hitDealer (deck, dealerHand) {
   let [ cardValue, cardSuit ] = randomCard(deck);
-  dealerHand[cardValue].push(cardSuit); // adds the card to the dealerHand
+  return dealerHand[cardValue].push(cardSuit); // adds the card to the dealerHand
 }
 
 function handTotal(hand, total = 0) { // exams hand and adds up the total
@@ -117,44 +100,57 @@ function handTotal(hand, total = 0) { // exams hand and adds up the total
   return total;
 }
 
-function calculateAce(total, numOfAce) { // I tried to parse through the eslint rules, I believe this is a valid error exception case
+function calculateAce(total, numOfAce) {
   switch (numOfAce) {
     case 1:
-      // eslint-disable-next-line no-unused-expressions
-      (total <= 10) ? total += 11 : total += 1;
+      total = (total <= 10) ? total + 11 : total + 1;
       break;
     case 2:
-      // eslint-disable-next-line no-unused-expressions
-      (total <= 9) ? total += 12 : total += 2;
+      total = (total <= 9) ? total + 12 : total + 2;
       break;
     case 3:
-      // eslint-disable-next-line no-unused-expressions
-      (total <= 8) ? total += 13 : total += 3;
+      total = (total <= 8) ? total + 13 : total + 3;
       break;
     case 4:
-      // eslint-disable-next-line no-unused-expressions
-      (total <= 7) ? total += 14 : total += 4;
+      total = (total <= 7) ? total + 14 : total + 4;
       break;
   }
   return total;
 }
 
-// hitPlayer(deck);
-// hitPlayer(deck);
-console.log(handTotal(playerHand));
-console.log(playerHand);
+function prompt(str) {
+  return console.log(`=> ${str}`);
+}
 
-// hitDealer(deck);
-// console.log(handTotal(dealerHand));
-// console.log(dealerHand);
+function copyObj(obj) {
+  let serializedObj = JSON.stringify(obj);
+  let copiedObj = JSON.parse(serializedObj);
+  return copiedObj;
+}
+
+while (true) {
+  let deck = copyObj(FULL_DECK);
+  let playerHand = copyObj(EMPTY_HAND);
+  let dealerHand = copyObj(EMPTY_HAND);
+
+  while (true) {
+    prompt(`Total: ${handTotal(playerHand)}`);
+    prompt('hit or stay?');
+    let answer = readline.question();
+    if (answer === 'stay') break;
+    hitPlayer(deck, playerHand);
+  }
+  console.log(playerHand);
+  console.log(deck);
+  break;
+}
+console.log(FULL_DECK);
+
+
+// hitPlayer(deck, playerHand);
+// hitPlayer(deck, playerHand);
+// console.log(handTotal(playerHand));
+// console.log(playerHand);
 // console.log(deck);
-// for (let idx = 0; idx < 52; idx++) {
-//   hitPlayer(deck);
-// }
 
-// hitDealer(deck);
-// handTotal(dealerHand);
-// //x2
-// hitPlayer(deck);
-// handTotal(playerHand);
 
