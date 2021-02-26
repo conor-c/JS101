@@ -41,20 +41,14 @@ const FULL_DECK = {
 };
 
 const EMPTY_HAND = {
-  2: [],
-  3: [],
-  4: [],
-  5: [],
-  6: [],
-  7: [],
-  8: [],
-  9: [],
-  10: [],
-  jack: [],
-  queen: [],
-  king: [],
-  ace: [],
+  2: [], 3: [], 4: [],
+  5: [], 6: [], 7: [],
+  8: [], 9: [], 10: [],
+  jack: [], queen: [],
+  king: [], ace: [],
 };
+
+const HIGHEST_SCORE = 21;
 
 function randomCard(deck) { // SIDE EFFECT, WILL MUTATE DECK OBJECT
   let availableCardValues = Object.keys(deck).filter(key => { // all deck keys that still have arrays with suits in them
@@ -128,29 +122,100 @@ function copyObj(obj) {
   return copiedObj;
 }
 
-while (true) {
+function winOrBust(total) {
+  let result = {};
+  if (total === HIGHEST_SCORE) {
+    result.won = true;
+  } else if (total > HIGHEST_SCORE) {
+    result.bust = true;
+  }
+  return result;
+}
+
+function calculateWinner(playerTotal, dealerTotal) {
+  let result = {};
+  let playerBust = !!winOrBust(playerTotal).bust;
+  let dealerBust = !!winOrBust(dealerTotal).bust;
+
+  if (playerBust && !dealerBust) {
+    result.dealerWon = true;
+    return result;
+  }
+  if (dealerBust && !playerBust) {
+    result.playerWon = true;
+    return result;
+  }
+  if (dealerBust && playerBust) {
+    result.tie = true;
+    return result;
+  }
+  if (playerTotal > dealerTotal) {
+    result.playerWon = true;
+    return result;
+  }
+  if (dealerTotal > playerTotal) {
+    result.dealerWon = true;
+    return result;
+  }
+  if (dealerTotal === playerTotal) {
+    result.tie = true;
+    return result;
+  }
+}
+
+while (true) { // MAIN GAME LOOP
   let deck = copyObj(FULL_DECK);
   let playerHand = copyObj(EMPTY_HAND);
   let dealerHand = copyObj(EMPTY_HAND);
 
-  while (true) {
-    prompt(`Total: ${handTotal(playerHand)}`);
+  while (true) { // Player hit or stay
+    let playerTotal = handTotal(playerHand);
+    prompt(`Total: ${playerTotal}`);
+
+    if (winOrBust(playerTotal).won) {
+      prompt("You've hit 21!");
+      break;
+    } else if (winOrBust(playerTotal).bust) {
+      prompt("You've busted.");
+      break;
+    }
+
     prompt('hit or stay?');
     let answer = readline.question();
     if (answer === 'stay') break;
     hitPlayer(deck, playerHand);
   }
-  console.log(playerHand);
-  console.log(deck);
+
+  while (true) {
+    let dealerTotal = handTotal(dealerHand);
+    prompt(`Dealer hits, Total: ${dealerTotal}`);
+    if (dealerTotal >= 17 && !winOrBust(dealerTotal).bust) {
+      prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
+      break;
+    }
+    if (winOrBust(dealerTotal).bust) {
+      prompt(`Dealer has busted with a total of: ${dealerTotal}`);
+      break;
+    }
+    hitDealer(deck, dealerHand);
+  }
+
+  let dealerTotal = handTotal(dealerHand);
+  let playerTotal = handTotal(playerHand);
+  let result = calculateWinner(playerTotal, dealerTotal);
+
+  if (result.playerWon) {
+    prompt('You won!');
+  } else if (result.dealerWon) {
+    prompt('Dealer won.');
+  } else if (result.tie) {
+    prompt('You tied with the dealer.');
+  }
   break;
 }
-console.log(FULL_DECK);
-
 
 // hitPlayer(deck, playerHand);
 // hitPlayer(deck, playerHand);
 // console.log(handTotal(playerHand));
 // console.log(playerHand);
 // console.log(deck);
-
-
