@@ -83,9 +83,7 @@ function findRisk(winCombo, board, marker) { // marker will refer to player or h
     let comboFinisher = winCombo.find(square => { // checking if the remaining square is empty
       return board[square] === INITIAL_MARKER; // if true, comboFinisher is assigned that value, assigned undefined otherwise
     });
-    if (comboFinisher !== undefined) {
-      return comboFinisher;
-    }
+    if (comboFinisher) return comboFinisher;
   }
   return null; // if the last square in winCombo isn't empty
 }
@@ -161,16 +159,16 @@ function detectWinner(board) {
 
 function addScore(winner, objWithScore) {
   if (winner === 'Player') {
-    objWithScore.playerScore += 1;
+    objWithScore.player += 1;
   } else if (winner === 'Computer') {
-    objWithScore.computerScore += 1;
+    objWithScore.computer += 1;
   }
 }
 
 function initalizeScore() {
   let score = {
-    playerScore: 0,
-    computerScore: 0,
+    player: 0,
+    computer: 0,
   };
   return score;
 }
@@ -224,12 +222,12 @@ function updateAndDisplayGameResults(board, score) {
     let winner = detectWinner(board);
     addScore(winner, score);          // MODIFIES THE SCORE OBJECT ARGUEMENT BEING PASSED IN
     prompt(`${winner} won this game!`);
-    prompt(`Current Player Score: ${score.playerScore}/${SCORE_TO_WIN}`);
-    prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
+    prompt(`Current Player Score: ${score.player}/${SCORE_TO_WIN}`);
+    prompt(`Current Computer Score: ${score.computer}/${SCORE_TO_WIN}`);
   } else {
     prompt("It's a tie!");
-    prompt(`Current Player Score: ${score.playerScore}/${SCORE_TO_WIN}`);
-    prompt(`Current Computer Score: ${score.computerScore}/${SCORE_TO_WIN}`);
+    prompt(`Current Player Score: ${score.player}/${SCORE_TO_WIN}`);
+    prompt(`Current Computer Score: ${score.computer}/${SCORE_TO_WIN}`);
   }
 }
 
@@ -256,10 +254,10 @@ while (true) { //new match / running loop
 
     updateAndDisplayGameResults(board, score); // consider refacoring function, too many side effects
 
-    if (score.playerScore === 5) {
+    if (score.player === SCORE_TO_WIN) {
       prompt(`You have won ${SCORE_TO_WIN} games and have won the match!`);
       break;
-    } else if (score.computerScore === 5) {
+    } else if (score.computer === SCORE_TO_WIN) {
       prompt(`Sorry, the computer has won ${SCORE_TO_WIN} games and has won the match.`);
       break;
     }
@@ -268,7 +266,7 @@ while (true) { //new match / running loop
     if (matchForfeit === 'q') break;
   }
 
-  let restart = restartGame();
-  if (!restart) break;
+
+  if (!restartGame()) break;
 }
 prompt('Thanks for playing Tic-Tac-Toe!');
