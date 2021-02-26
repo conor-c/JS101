@@ -117,34 +117,30 @@ function handTotal(hand, total = 0) { // exams hand and adds up the total
   return total;
 }
 
-
-// eslint-disable-next-line max-lines-per-function
-function calculateAce(total, numOfAce) {
-  if (numOfAce === 1 && total <= 10) {
-    total += 11;
-  } else if (numOfAce === 1 && total > 10) {
-    total += 1;
-  }
-  if (numOfAce === 2 && total <= 9) {
-    total += 12;
-  } else if (numOfAce === 2 && total > 9) {
-    total += 2;
-  }
-  if (numOfAce === 3 && total <= 8) {
-    total += 13;
-  } else if (numOfAce === 3 && total > 8) {
-    total += 3;
-  }
-  if (numOfAce === 4 && total <= 7) {
-    total += 14;
-  } else if (numOfAce === 4 && total > 7) {
-    total += 4;
+function calculateAce(total, numOfAce) { // I tried to parse through the eslint rules, I believe this is a valid error exception case
+  switch (numOfAce) {
+    case 1:
+      // eslint-disable-next-line no-unused-expressions
+      (total <= 10) ? total += 11 : total += 1;
+      break;
+    case 2:
+      // eslint-disable-next-line no-unused-expressions
+      (total <= 9) ? total += 12 : total += 2;
+      break;
+    case 3:
+      // eslint-disable-next-line no-unused-expressions
+      (total <= 8) ? total += 13 : total += 3;
+      break;
+    case 4:
+      // eslint-disable-next-line no-unused-expressions
+      (total <= 7) ? total += 14 : total += 4;
+      break;
   }
   return total;
 }
 
-hitPlayer(deck);
-hitPlayer(deck);
+// hitPlayer(deck);
+// hitPlayer(deck);
 console.log(handTotal(playerHand));
 console.log(playerHand);
 
