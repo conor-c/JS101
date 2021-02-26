@@ -22,6 +22,8 @@
 //  - Ace is worth 1
 
 // DATA STRUCTURE:
+const readline = require('readline-sync');
+
 let deck = {
   2: ['hearts', 'diamonds', 'clubs', 'spades'],
   3: ['hearts', 'diamonds', 'clubs', 'spades'],
@@ -90,8 +92,73 @@ function randomCard(deck) { // SIDE EFFECT, EDITS THE DECK OBJECT
 function hitPlayer (deck) {
   let [ cardValue, cardSuit ] = randomCard(deck);
   playerHand[cardValue].push(cardSuit); // adds the card to the playerHand
-  console.log(`You are dealt the "${cardValue} of ${cardSuit}".`);
+  // console.log(`You are dealt the "${cardValue} of ${cardSuit}".`);
 }
 
+function hitDealer (deck) {
+  let [ cardValue, cardSuit ] = randomCard(deck);
+  dealerHand[cardValue].push(cardSuit); // adds the card to the dealerHand
+}
+
+function handTotal(hand, total = 0) { // exams hand and adds up the total
+  let currentCards = Object.keys(hand).filter(card => {
+    return hand[card].length >= 1;
+  });
+
+  currentCards.forEach(card => {
+    let numOfCards = hand[card].length;
+    let isNum = parseInt(card, 10);
+
+    if (isNum) total += isNum * numOfCards; // doesn't run if key can't be parsed to number (truthy)
+    if (card !== 'ace' && !isNum) total += 10 * numOfCards;
+    if (card === 'ace') total = calculateAce(total, numOfCards);
+  });
+
+  return total;
+}
+
+
+// eslint-disable-next-line max-lines-per-function
+function calculateAce(total, numOfAce) {
+  if (numOfAce === 1 && total <= 10) {
+    total += 11;
+  } else if (numOfAce === 1 && total > 10) {
+    total += 1;
+  }
+  if (numOfAce === 2 && total <= 9) {
+    total += 12;
+  } else if (numOfAce === 2 && total > 9) {
+    total += 2;
+  }
+  if (numOfAce === 3 && total <= 8) {
+    total += 13;
+  } else if (numOfAce === 3 && total > 8) {
+    total += 3;
+  }
+  if (numOfAce === 4 && total <= 7) {
+    total += 14;
+  } else if (numOfAce === 4 && total > 7) {
+    total += 4;
+  }
+  return total;
+}
+
+hitPlayer(deck);
+hitPlayer(deck);
+console.log(handTotal(playerHand));
 console.log(playerHand);
-console.log(deck);
+
+// hitDealer(deck);
+// console.log(handTotal(dealerHand));
+// console.log(dealerHand);
+// console.log(deck);
+// for (let idx = 0; idx < 52; idx++) {
+//   hitPlayer(deck);
+// }
+
+// hitDealer(deck);
+// handTotal(dealerHand);
+// //x2
+// hitPlayer(deck);
+// handTotal(playerHand);
+
