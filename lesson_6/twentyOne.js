@@ -200,7 +200,7 @@ while (true) { // MAIN GAME LOOP
     prompt(`Your Total: ${playerTotal}`);
 
     if (playerTotal === HIGHEST_SCORE) {
-      prompt("You've hit 21!");
+      prompt(`You've hit ${HIGHEST_SCORE}!`);
       break;
     }
 
@@ -235,7 +235,7 @@ while (true) { // MAIN GAME LOOP
   prompt(`Final Scores:`);
   prompt(`You: ${playerTotal}`);
   console.log(`Dealer: ${dealerTotal}`);
-  console.log(deck);
+
 
   if (!restart()) break;
   console.clear();
