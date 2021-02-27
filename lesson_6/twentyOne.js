@@ -33,34 +33,35 @@ function prompt(str) {
   return console.log(`=> ${str}`);
 }
 
-function hitPlayer (deck, playerHand) {
+function hitPlayer (deck, playerHand) { // SIDE EFFECT, MUTATES PLAYERHAND ARGUMENT
   let [ cardValue, cardSuit ] = randomCard(deck);
-  return playerHand[cardValue].push(cardSuit); // adds the card to the playerHand
+  playerHand[cardValue].push(cardSuit);
+  return [cardValue, cardSuit];
 }
 
-function hitDealer (deck, dealerHand) {
+function hitDealer (deck, dealerHand) { // SIDE EFFECT, MUTATES DEALERHAND ARGUMENT
   let [ cardValue, cardSuit ] = randomCard(deck);
-  return dealerHand[cardValue].push(cardSuit); // adds the card to the dealerHand
+  dealerHand[cardValue].push(cardSuit);
+  return [cardValue, cardSuit];
 }
 
-function randomCard(deck) { // SIDE EFFECT, WILL MUTATE DECK OBJECT
-  let availableCardValues = Object.keys(deck).filter(key => { // all deck keys that still have arrays with suits in them
+function randomCard(deck) { // SIDE EFFECT, WILL MUTATE DECK ARGUMENT
+  let availableCardValues = Object.keys(deck).filter(key => {
     return deck[key].length >= 1;
   });
 
-  let randomCardValIdx = Math.floor(Math.random() * availableCardValues.length); // index of a random card value that still has suits in array
-  let nameOfRandomKey = availableCardValues[randomCardValIdx]; // string value of deck key (CARD VALUE AKA 'JACK' ETC)
+  let randomCardValIdx = Math.floor(Math.random() * availableCardValues.length);
+  let nameOfRandomKey = availableCardValues[randomCardValIdx];
 
   let randomCardSuitIdx = Math.floor(
-    Math.random() * deck[nameOfRandomKey].length); // idx of random card suit 0 through length of array
-
+    Math.random() * deck[nameOfRandomKey].length);
   let nameOfRandomSuit = String(deck[nameOfRandomKey]
-    .splice(randomCardSuitIdx, 1)); // name of card suit 'hearts' 'spades' etc
+    .splice(randomCardSuitIdx, 1));
 
   return [nameOfRandomKey, nameOfRandomSuit];
 }
 
-function handTotal(hand, total = 0) { // exams hand and adds up the total
+function handTotal(hand, total = 0) {
   let currentCards = Object.keys(hand).filter(card => {
     return hand[card].length >= 1;
   });
@@ -95,6 +96,10 @@ function calculateAce(total, numOfAce) {
   return total;
 }
 
+function logLineSpacer() {
+  console.log('--------------------');
+}
+
 function restart() {
   prompt('Want to play another game?');
   while (true) {
@@ -106,60 +111,133 @@ function restart() {
   }
 }
 
-// function getHitOrStay(total) {
-//   if (total)
-// }
+function getHitOrStay() {
+  prompt('Would you like to hit or stay?');
+  while (true) {
+    prompt("Enter 'hit' or 'stay':");
+    let answer = readline.question().toLowerCase();
+    if (answer === 'hit') return true;
+    if (answer === 'stay') return false;
+    prompt(`Sorry "${answer}" is not a valid input.`);
+  }
+}
+
+function dealAndLogStartingHands(deck, playerHand, dealerHand) { // Refactor
+  let firstCardDealt = hitPlayer(deck, playerHand);
+  prompt(`You're dealt: ${firstCardDealt[0]} of ${firstCardDealt[1]}.`);
+  logLineSpacer();
+
+  let facedownCard = hitDealer(deck, dealerHand);
+  console.log('(Dealer is dealt a card facedown.)');
+  logLineSpacer();
+
+  let thirdCardDealt = hitPlayer(deck, playerHand);
+  prompt(`You are dealt: ${thirdCardDealt[0]} of ${thirdCardDealt[1]}.`);
+  logLineSpacer();
+
+  let fourthCardDealt = hitDealer(deck, dealerHand);
+  console.log(`(Dealer is dealt: ${fourthCardDealt[0]} of ${fourthCardDealt[1]}.)`);
+  logLineSpacer();
+
+  return facedownCard;
+}
+
+function busted(hand) {
+  return handTotal(hand) > HIGHEST_SCORE;
+}
+
+function detectResults(playerHand, dealerHand) {
+  let playerTotal = handTotal(playerHand);
+  let dealerTotal = handTotal(dealerHand);
+  let result = {};
+
+  if (playerTotal > HIGHEST_SCORE ) {
+    result.playerBust = true;
+  } else if (dealerTotal > HIGHEST_SCORE) {
+    result.dealerBust = true;
+  } else if (playerTotal > dealerTotal) {
+    result.playerWon = true;
+  } else if (dealerTotal > playerTotal) {
+    result.dealerWon = true;
+  } else {
+    result.tie = true;
+  }
+  return result;
+}
+
+function displayResults(playerHand, dealerHand) {
+  let result = detectResults(playerHand, dealerHand);
+
+  if (result.playerBust) {
+    prompt('You busted. DEALER WINS.');
+  }
+  if (result.dealerBust) {
+    prompt('Dealer busted. YOU WIN.');
+  }
+  if (result.playerWon) {
+    prompt('You win!');
+  }
+  if (result.dealerWon) {
+    prompt('Dealer wins!');
+  }
+  if (result.tie) {
+    prompt("It's a tie.");
+  }
+}
 
 while (true) { // MAIN GAME LOOP
   let deck = copyObj(FULL_DECK);
   let playerHand = copyObj(EMPTY_HAND);
   let dealerHand = copyObj(EMPTY_HAND);
-  let playerStayTotal = 0;
-  let dealerStayTotal = 0;
+  let playerTotal = 0;
+  let dealerTotal = 0;
 
-  while (true) { // Player hit or stay
-    let playerTotal = handTotal(playerHand);
-    playerStayTotal = playerTotal;
-    prompt(`Total: ${playerTotal}`);
+  console.log('Welcome to Twenty One!');
+  let facedownCard = dealAndLogStartingHands(deck, playerHand, dealerHand);
+
+  while (true) { // Player session loop
+    playerTotal = handTotal(playerHand);
+    prompt(`Your Total: ${playerTotal}`);
 
     if (playerTotal === HIGHEST_SCORE) {
       prompt("You've hit 21!");
       break;
-    } else if (playerTotal > HIGHEST_SCORE) {
-      prompt("You've busted.");
-      prompt("Dealer wins.");
-      break;
     }
-    prompt('hit or stay?');
-    let answer = readline.question();
-    if (answer === 'stay') break;
-    hitPlayer(deck, playerHand);
+
+    if (busted(playerHand) || !getHitOrStay()) break;
+
+    let cardDealt = hitPlayer(deck, playerHand);
+    prompt(`You are dealt: ${cardDealt[0]} of ${cardDealt[1]}.`);
   }
 
-  while (true) { // Dealer session loop
-    if (playerStayTotal > 21) break;
-    let dealerTotal = handTotal(dealerHand);
-    dealerStayTotal = dealerTotal;
 
-    if (dealerTotal > playerStayTotal && dealerTotal <= HIGHEST_SCORE) {
-      prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
-      if (dealerStayTotal > playerStayTotal) {
-        prompt(`Dealer has won with a score of ${dealerStayTotal} to your ${playerStayTotal}.`);
+  while (!busted(playerHand)) { // card reveal + loop (Won't start if player is bust)
+    console.log(`Dealer reveals their facedown card to be: ${facedownCard[0]} of ${facedownCard[1]}`);
+    console.log('Dealer begins to draw...');
+    while (true) { // main dealer session loop
+      dealerTotal = handTotal(dealerHand);
+      let results = detectResults(playerHand, dealerHand);
+
+      if (results.dealerWon) { // will hit until win or bust
+        console.log(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
+        break;
       }
-      break;
-    } else if (dealerTotal > HIGHEST_SCORE) {
-      prompt(`Dealer has busted with a total of: ${dealerTotal}`);
-      prompt(`You win!`);
-      break;
+      if (results.dealerBust) break;
+
+      let cardDealt = hitDealer(deck, dealerHand);
+      console.log(`Dealer is dealt: ${cardDealt[0]} of ${cardDealt[1]}.`);
     }
-    hitDealer(deck, dealerHand);
+    break;
   }
 
-  // prompt(`Final Scores:`);
-  // prompt(`You: ${playerStayTotal}`);
-  // prompt(`Dealer: ${dealerStayTotal}`);
+  displayResults(playerHand, dealerHand);
 
+  prompt(`Final Scores:`);
+  prompt(`You: ${playerTotal}`);
+  console.log(`Dealer: ${dealerTotal}`);
+  console.log(deck);
 
   if (!restart()) break;
+  console.clear();
 }
-prompt('Thanks for playing Twenty One!');
+console.log('Thanks for playing Twenty One!');
