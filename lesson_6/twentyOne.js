@@ -137,6 +137,7 @@ function detectResults(playerTotal, dealerTotal) {
 function displayRoundResults(playerTotal, dealerTotal) {
   let result = detectResults(playerTotal, dealerTotal);
 
+  lineSpace();
   if (result.playerBust) {
     prompt('You busted. DEALER WINS.');
   } else if (result.dealerBust) {
@@ -148,12 +149,26 @@ function displayRoundResults(playerTotal, dealerTotal) {
   } else if (result.tie) {
     prompt("It's a tie.");
   }
+  lineSpace();
+}
+
+function displayRoundScore(playerTotal, dealerTotal) {
+  prompt(`Final Scores:`);
+  prompt(`You: ${playerTotal}`);
+  prompt(`Dealer: ${dealerTotal}`);
+}
+
+function onlyTwoCardsInHand(hand) {
+  if (Object.values(hand).flat().length === 2) return true;
+  return false;
 }
 
 function displayMatchStatus(playerWins, dealerWins) {
+  lineSpace();
   prompt('Win 5 rounds to win the match!');
   prompt(`Player Rounds Won: ${playerWins}/${ROUNDS_TO_WIN_MATCH}`);
   prompt(`Dealer Rounds Won: ${dealerWins}/${ROUNDS_TO_WIN_MATCH}`);
+  lineSpace();
 }
 
 function removeCardFrom(card, deck) { // SIDE EFFECT REMOVES ARG CARD FROM ARG DECK
@@ -222,7 +237,7 @@ while (true) {
     displayGreetingMessage(playerWins, dealerWins);
 
     let dealerSecretCard = dealCard(deck, dealerHand); // DEALER STARTING HAND
-    prompt('The Dealer deals themselves a card facedown.');
+    prompt('Dealer is dealt: a card facedown.');
     displayCard('Dealer', dealCard(deck, dealerHand));
 
     lineSpace();
@@ -243,34 +258,27 @@ while (true) {
       lineSpace();
     }
 
+    while (true) { // DEALER SESSION LOOP
+      dealerTotal = handTotal(dealerHand);
+      let results = detectResults(playerTotal, dealerTotal);
 
-    while (true) {
-      lineSpace();
-      prompt(`Dealer reveals their facedown card to be: ${dealerSecretCard[0]} of ${dealerSecretCard[1]}`);
+      if (onlyTwoCardsInHand(dealerHand)) {
+        prompt(`Dealer reveals their facedown card to be: ${dealerSecretCard[0]} of ${dealerSecretCard[1]}.`);
+      }
 
-      if (busted(playerTotal)) {
-        dealerTotal = handTotal(dealerHand); // so a total of 0 isn't shown on player bust condition
+      if (busted(playerTotal)) break;
+
+      if (onlyTwoCardsInHand(dealerHand)) {
+        prompt('Dealer begins to draw...');
+      }
+
+      if (busted(dealerTotal)) break;
+      if (results.dealerWon || dealerTotal >= DEALER_STAYS) {
+        prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
         break;
       }
 
-      while (true) { // DEALER SESSION LOOP
-        if (Object.values(dealerHand).length === 14) { // ONLY WANT TO DISPLAY ONCE PER ROUND(14 is empty hand + 2 cards)
-          prompt('Dealer begins to draw...');
-        }
-
-        dealerTotal = handTotal(dealerHand);
-        let results = detectResults(playerTotal, dealerTotal);
-
-        if (busted(dealerTotal)) break;
-
-        if (results.dealerWon || dealerTotal >= DEALER_STAYS) {
-          prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
-          break;
-        }
-
-        displayCard('Dealer', dealCard(deck, dealerHand));
-      }
-      break;
+      displayCard('Dealer', dealCard(deck, dealerHand));
     }
 
     let results = detectResults(playerTotal, dealerTotal);
@@ -280,17 +288,9 @@ while (true) {
       dealerWins += 1;
     }
 
-    lineSpace();
     displayRoundResults(playerTotal, dealerTotal, playerWins, dealerWins);
-    lineSpace();
-
-    prompt(`Final Scores:`);
-    prompt(`You: ${playerTotal}`);
-    prompt(`Dealer: ${dealerTotal}`);
-
-    lineSpace();
+    displayRoundScore(playerTotal, dealerTotal);
     displayMatchStatus(playerWins, dealerWins);
-    lineSpace();
 
     if (detectMatchOver(playerWins, dealerWins)) {
       displayMatchOver(playerWins, dealerWins);
@@ -304,6 +304,5 @@ while (true) {
   if (!restart('match')) break;
   console.clear();
 }
-
 
 console.log('Thanks for playing Twenty One!');
