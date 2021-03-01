@@ -23,7 +23,7 @@ const EMPTY_HAND = {
 };
 const HIGHEST_SCORE = 21;
 const ROUNDS_TO_WIN_MATCH = 5;
-const DEALER_STAYS = 17;
+const DEALER_STAYS_AT = 17;
 
 function copyObj(obj) {
   let serializedObj = JSON.stringify(obj);
@@ -273,7 +273,7 @@ while (true) {
       }
 
       if (busted(dealerTotal)) break;
-      if (results.dealerWon || dealerTotal >= DEALER_STAYS) {
+      if (results.dealerWon || dealerTotal >= DEALER_STAYS_AT) {
         prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
         break;
       }
