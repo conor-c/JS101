@@ -167,21 +167,11 @@ function addCardTo(card, hand) { // SIDE EFFECT ADDS ARG CARD TO ARG HAND
 }
 
 function dealCard(deck, hand) {
-  let card = selectRandomCardFrom(deck); // DRAWS RANDOM CARD FROM DECK
+  let card = selectRandomCardFrom(deck); // SELECTS RANDOM CARD FROM DECK
   removeCardFrom(card, deck); // SIDE EFFECT, WILL DELETE CARD FROM DECK
   addCardTo(card, hand); // SIDE EFFECT, WILL ADD CARD TO HAND
-  return card;
+  return card; // RETURNS SELECTED CARD FOR USER DISPLAY
 }
-
-// function updateRoundScore(playerTotal, dealerTotal) {
-//   let results = detectResults(playerTotal, dealerTotal);
-//   if (results.playerWon || results.dealerBust) {
-//     return 'PLAYER';
-//   } else if (results.dealerWon || results.playerBust) {
-//     return 'DEALER';
-//   }
-// }
-
 
 function detectMatchOver (playerWins, dealerWins) {
   if (playerWins === ROUNDS_TO_WIN_MATCH) {
@@ -203,9 +193,25 @@ function displayMatchOver(playerWins, dealerWins) {
   }
 }
 
+function displayGreetingMessage(playerWins, dealerWins) {
+  if (playerWins === 0 && dealerWins === 0) { // IF FIRST ROUND IS A TIE, WILL ALSO DISPLAY THIS MESSAGE
+    prompt(`The game is Twenty One. Win ${ROUNDS_TO_WIN_MATCH} rounds to win the match!`);
+    lineSpace();
+  } else {
+    prompt(`Another round of Twenty One.`);
+    prompt(`You've won ${playerWins}/${ROUNDS_TO_WIN_MATCH} rounds. Dealer has won ${dealerWins}/${ROUNDS_TO_WIN_MATCH} rounds.`);
+    lineSpace();
+  }
+}
+
+function displayCard(playerOrDealer, cardToDisplay) {
+  prompt(`${playerOrDealer} is dealt: ${cardToDisplay[0]} of ${cardToDisplay[1]}.`);
+}
+
 while (true) {
   let playerWins = 0;
   let dealerWins = 0;
+
   while (true) { // MAIN GAME LOOP
     let deck = copyObj(FULL_DECK);
     let playerHand = copyObj(EMPTY_HAND);
@@ -213,57 +219,56 @@ while (true) {
     let playerTotal = handTotal(playerHand);
     let dealerTotal = handTotal(dealerHand);
 
-    prompt('Welcome to Twenty One!');
-    lineSpace();
-    // DEALER STARTING HAND
-    let dealerSecretCard = dealCard(deck, dealerHand);
-    let dealerCard2 = dealCard(deck, dealerHand);
-    prompt('The dealer deals themselves a card facedown.');
-    prompt(`The dealer draws: ${dealerCard2[0]} of ${dealerCard2[1]}`);
-    lineSpace();
-    // PLAYER STARTING HAND
-    let playerCard1 = dealCard(deck, playerHand);
-    let playerCard2 = dealCard(deck, playerHand);
-    prompt(`You are dealt: ${playerCard1[0]} of ${playerCard1[1]}`);
-    prompt(`You are dealt: ${playerCard2[0]} of ${playerCard2[1]}`);
+    displayGreetingMessage(playerWins, dealerWins);
 
-    while (true) { // Player session loop
+    let dealerSecretCard = dealCard(deck, dealerHand); // DEALER STARTING HAND
+    prompt('The Dealer deals themselves a card facedown.');
+    displayCard('Dealer', dealCard(deck, dealerHand));
+
+    lineSpace();
+
+    displayCard('Player', dealCard(deck, playerHand));
+    displayCard('Player', dealCard(deck, playerHand));
+
+    while (true) { // PLAYER SESSION LOOP
       playerTotal = handTotal(playerHand);
       prompt(`Your Total: ${playerTotal}`);
 
       if (playerTotal === HIGHEST_SCORE) {
         prompt(`You've hit ${HIGHEST_SCORE}!`);
       }
-
       if (busted(playerTotal) || !getHitOrStay()) break;
 
-      let cardDealt = dealCard(deck, playerHand);
-      prompt(`You are dealt: ${cardDealt[0]} of ${cardDealt[1]}.`);
+      displayCard('Player', dealCard(deck, playerHand));
       lineSpace();
     }
 
 
-    while (true) { // card reveal + loop (Won't start if player is bust)
+    while (true) {
       lineSpace();
       prompt(`Dealer reveals their facedown card to be: ${dealerSecretCard[0]} of ${dealerSecretCard[1]}`);
+
       if (busted(playerTotal)) {
-        dealerTotal = handTotal(dealerHand);
+        dealerTotal = handTotal(dealerHand); // so a total of 0 isn't shown on player bust condition
         break;
       }
-      prompt('Dealer begins to draw...');
-      while (true) { // main dealer session loop
+
+      while (true) { // DEALER SESSION LOOP
+        if (Object.values(dealerHand).length === 14) { // ONLY WANT TO DISPLAY ONCE PER ROUND(14 is empty hand + 2 cards)
+          prompt('Dealer begins to draw...');
+        }
+
         dealerTotal = handTotal(dealerHand);
         let results = detectResults(playerTotal, dealerTotal);
 
-        if (results.dealerBust) break;
+        if (busted(dealerTotal)) break;
 
         if (results.dealerWon || dealerTotal >= DEALER_STAYS) {
           prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
           break;
         }
 
-        let cardDealt = dealCard(deck, dealerHand);
-        prompt(`Dealer is dealt: ${cardDealt[0]} of ${cardDealt[1]}.`);
+        displayCard('Dealer', dealCard(deck, dealerHand));
       }
       break;
     }
