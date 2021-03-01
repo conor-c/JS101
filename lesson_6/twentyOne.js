@@ -22,6 +22,8 @@ const EMPTY_HAND = {
   king: [], ace: [],
 };
 const HIGHEST_SCORE = 21;
+const ROUNDS_TO_WIN_MATCH = 5;
+const DEALER_STAYS = 17;
 
 function copyObj(obj) {
   let serializedObj = JSON.stringify(obj);
@@ -89,8 +91,8 @@ function lineSpace() {
   console.log('--------------------');
 }
 
-function restart() {
-  prompt('Want to play another game?');
+function restart(roundOrMatch) {
+  prompt(`Want to play another ${roundOrMatch}?`);
   while (true) {
     prompt(`Enter 'y' for yes, or 'n' for no:`);
     let answer = readline.question().toLowerCase();
@@ -132,24 +134,26 @@ function detectResults(playerTotal, dealerTotal) {
   return result;
 }
 
-function displayResults(playerTotal, dealerTotal) {
+function displayRoundResults(playerTotal, dealerTotal) {
   let result = detectResults(playerTotal, dealerTotal);
 
   if (result.playerBust) {
     prompt('You busted. DEALER WINS.');
-  }
-  if (result.dealerBust) {
+  } else if (result.dealerBust) {
     prompt('Dealer busted. YOU WIN.');
-  }
-  if (result.playerWon) {
+  } else if (result.playerWon) {
     prompt('You win!');
-  }
-  if (result.dealerWon) {
+  } else if (result.dealerWon) {
     prompt('Dealer wins!');
-  }
-  if (result.tie) {
+  } else if (result.tie) {
     prompt("It's a tie.");
   }
+}
+
+function displayMatchStatus(playerWins, dealerWins) {
+  prompt('Win 5 rounds to win the match!');
+  prompt(`Player Rounds Won: ${playerWins}/${ROUNDS_TO_WIN_MATCH}`);
+  prompt(`Dealer Rounds Won: ${dealerWins}/${ROUNDS_TO_WIN_MATCH}`);
 }
 
 function removeCardFrom(card, deck) { // SIDE EFFECT REMOVES ARG CARD FROM ARG DECK
@@ -169,80 +173,132 @@ function dealCard(deck, hand) {
   return card;
 }
 
-while (true) { // MAIN GAME LOOP
-  let deck = copyObj(FULL_DECK);
-  let playerHand = copyObj(EMPTY_HAND);
-  let dealerHand = copyObj(EMPTY_HAND);
-  let playerTotal = handTotal(playerHand);
-  let dealerTotal = handTotal(dealerHand);
-
-  prompt('Welcome to Twenty One!');
-  lineSpace();
-  // DEALER STARTING HAND
-  let dealerSecretCard = dealCard(deck, dealerHand);
-  let dealerCard2 = dealCard(deck, dealerHand);
-  prompt('The dealer deals themselves a card facedown.');
-  prompt(`The dealer draws: ${dealerCard2[0]} of ${dealerCard2[1]}`);
-  lineSpace();
-  // PLAYER STARTING HAND
-  let playerCard1 = dealCard(deck, playerHand);
-  let playerCard2 = dealCard(deck, playerHand);
-  prompt(`You are dealt: ${playerCard1[0]} of ${playerCard1[1]}`);
-  prompt(`You are dealt: ${playerCard2[0]} of ${playerCard2[1]}`);
+// function updateRoundScore(playerTotal, dealerTotal) {
+//   let results = detectResults(playerTotal, dealerTotal);
+//   if (results.playerWon || results.dealerBust) {
+//     return 'PLAYER';
+//   } else if (results.dealerWon || results.playerBust) {
+//     return 'DEALER';
+//   }
+// }
 
 
-  while (true) { // Player session loop
-    playerTotal = handTotal(playerHand);
-    prompt(`Your Total: ${playerTotal}`);
-
-    if (playerTotal === HIGHEST_SCORE) {
-      prompt(`You've hit ${HIGHEST_SCORE}!`);
-      break;
-    }
-
-    if (busted(playerTotal) || !getHitOrStay()) break;
-
-    let cardDealt = dealCard(deck, playerHand);
-    prompt(`You are dealt: ${cardDealt[0]} of ${cardDealt[1]}.`);
-    lineSpace();
+function detectMatchOver (playerWins, dealerWins) {
+  if (playerWins === ROUNDS_TO_WIN_MATCH) {
+    return 'PLAYER';
+  } else if (dealerWins === ROUNDS_TO_WIN_MATCH) {
+    return 'DEALER';
   }
+  return null;
+}
 
+function displayMatchOver(playerWins, dealerWins) {
+  let matchWinner = detectMatchOver(playerWins, dealerWins);
 
-  while (true) { // card reveal + loop (Won't start if player is bust)
+  if (matchWinner === 'PLAYER') {
+    prompt(`You have won ${ROUNDS_TO_WIN_MATCH} rounds and have won the match!`);
+  }
+  if (matchWinner === 'DEALER') {
+    prompt(`The dealer has won ${ROUNDS_TO_WIN_MATCH} rounds and has won the match.`);
+  }
+}
+
+while (true) {
+  let playerWins = 0;
+  let dealerWins = 0;
+  while (true) { // MAIN GAME LOOP
+    let deck = copyObj(FULL_DECK);
+    let playerHand = copyObj(EMPTY_HAND);
+    let dealerHand = copyObj(EMPTY_HAND);
+    let playerTotal = handTotal(playerHand);
+    let dealerTotal = handTotal(dealerHand);
+
+    prompt('Welcome to Twenty One!');
     lineSpace();
-    prompt(`Dealer reveals their facedown card to be: ${dealerSecretCard[0]} of ${dealerSecretCard[1]}`);
-    if (busted(playerTotal)) {
-      dealerTotal = handTotal(dealerHand);
-      break;
-    }
-    prompt('Dealer begins to draw...');
-    while (true) { // main dealer session loop
-      dealerTotal = handTotal(dealerHand);
-      let results = detectResults(playerTotal, dealerTotal);
+    // DEALER STARTING HAND
+    let dealerSecretCard = dealCard(deck, dealerHand);
+    let dealerCard2 = dealCard(deck, dealerHand);
+    prompt('The dealer deals themselves a card facedown.');
+    prompt(`The dealer draws: ${dealerCard2[0]} of ${dealerCard2[1]}`);
+    lineSpace();
+    // PLAYER STARTING HAND
+    let playerCard1 = dealCard(deck, playerHand);
+    let playerCard2 = dealCard(deck, playerHand);
+    prompt(`You are dealt: ${playerCard1[0]} of ${playerCard1[1]}`);
+    prompt(`You are dealt: ${playerCard2[0]} of ${playerCard2[1]}`);
 
-      if (results.dealerWon) { // will hit until win or bust
-        prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
-        break;
+    while (true) { // Player session loop
+      playerTotal = handTotal(playerHand);
+      prompt(`Your Total: ${playerTotal}`);
+
+      if (playerTotal === HIGHEST_SCORE) {
+        prompt(`You've hit ${HIGHEST_SCORE}!`);
       }
 
-      if (results.dealerBust) break;
+      if (busted(playerTotal) || !getHitOrStay()) break;
 
-      let cardDealt = dealCard(deck, dealerHand);
-      prompt(`Dealer is dealt: ${cardDealt[0]} of ${cardDealt[1]}.`);
+      let cardDealt = dealCard(deck, playerHand);
+      prompt(`You are dealt: ${cardDealt[0]} of ${cardDealt[1]}.`);
+      lineSpace();
     }
-    break;
+
+
+    while (true) { // card reveal + loop (Won't start if player is bust)
+      lineSpace();
+      prompt(`Dealer reveals their facedown card to be: ${dealerSecretCard[0]} of ${dealerSecretCard[1]}`);
+      if (busted(playerTotal)) {
+        dealerTotal = handTotal(dealerHand);
+        break;
+      }
+      prompt('Dealer begins to draw...');
+      while (true) { // main dealer session loop
+        dealerTotal = handTotal(dealerHand);
+        let results = detectResults(playerTotal, dealerTotal);
+
+        if (results.dealerBust) break;
+
+        if (results.dealerWon || dealerTotal >= DEALER_STAYS) {
+          prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
+          break;
+        }
+
+        let cardDealt = dealCard(deck, dealerHand);
+        prompt(`Dealer is dealt: ${cardDealt[0]} of ${cardDealt[1]}.`);
+      }
+      break;
+    }
+
+    let results = detectResults(playerTotal, dealerTotal);
+    if (results.playerWon || results.dealerBust) {
+      playerWins += 1;
+    } else if (results.dealerWon || results.playerBust) {
+      dealerWins += 1;
+    }
+
+    lineSpace();
+    displayRoundResults(playerTotal, dealerTotal, playerWins, dealerWins);
+    lineSpace();
+
+    prompt(`Final Scores:`);
+    prompt(`You: ${playerTotal}`);
+    prompt(`Dealer: ${dealerTotal}`);
+
+    lineSpace();
+    displayMatchStatus(playerWins, dealerWins);
+    lineSpace();
+
+    if (detectMatchOver(playerWins, dealerWins)) {
+      displayMatchOver(playerWins, dealerWins);
+      lineSpace();
+      break;
+    }
+
+    if (!restart('round')) break;
+    console.clear();
   }
-
-  lineSpace();
-  displayResults(playerTotal, dealerTotal);
-  lineSpace();
-
-  prompt(`Final Scores:`);
-  prompt(`You: ${playerTotal}`);
-  prompt(`Dealer: ${dealerTotal}`);
-
-  if (!restart()) break;
+  if (!restart('match')) break;
   console.clear();
 }
+
 
 console.log('Thanks for playing Twenty One!');
