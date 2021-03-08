@@ -274,7 +274,7 @@ while (true) {
 
       if (busted(dealerTotal)) break;
       if (results.dealerWon || dealerTotal >= DEALER_STAYS_AT) {
-        prompt(`Dealer has a total of ${dealerTotal} and has choosen to Stay.`);
+        prompt(`Dealer has a total of ${dealerTotal} and has chosen to Stay.`);
         break;
       }
 
