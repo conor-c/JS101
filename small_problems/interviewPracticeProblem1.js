@@ -25,10 +25,10 @@ console.log(vowelCount('grrr!'));
 // Input
 //  A string of ONE or MORE words
 // Output
-//  An array, each element corresponds to the number of vowels in the 
+//  An array, each element corresponds to the number of vowels in the
 //  argument word
 // Algorithm
-//  Seperate each word from the arguments string
+//  Separate each word from the arguments string
 //  check how many vowels are in the individual word
 //  push the number of vowels to the resulting array
 //  when out of words, return resulting array
@@ -37,9 +37,9 @@ function vowelCount(stringOfWords) {
   let wordsArray = stringOfWords.split(' ');
   const VOWELS = 'aeiou';
   if (stringOfWords.length === 0) return [];
-  let vowelsArray = wordsArray.map(invdividualWord => {
+  let vowelsArray = wordsArray.map(individualWord => {
     let vowelsInWord = 0;
-    invdividualWord.split('').forEach(char => {
+    individualWord.split('').forEach(char => {
       if (VOWELS.includes(char.toLowerCase())) {
         vowelsInWord += 1;
       }
