@@ -11,9 +11,9 @@
       - [Working with Strings](#working-with-strings)
       - [Working with Arrays, especially the iteration methods (forEach, map, filter, and find)](#working-with-arrays-especially-the-iteration-methods-foreach-map-filter-and-find)
       - [Working with objects; accessing keys and values of an Object as arrays](#working-with-objects-accessing-keys-and-values-of-an-object-as-arrays)
-      - [Arrays are objects](#arrays-are-objects)
+      - [Arrays are objects (?)](#arrays-are-objects-)
       - [Understand the concepts of pass-by-reference and pass-by-value](#understand-the-concepts-of-pass-by-reference-and-pass-by-value)
-      - [Variables as pointers](#variables-as-pointers)
+      - [Variables as pointers / references](#variables-as-pointers--references)
       - [Console.log vs return](#consolelog-vs-return)
       - [Truthiness vs. boolean](#truthiness-vs-boolean)
       - [Function definition and invocation](#function-definition-and-invocation)
@@ -32,6 +32,7 @@
   * Initialization is the act of declaring and assigning a variable a value upon creation.
   * Assignment is the act of attaching either a primitive data type to a variable by value, or a pointer to a memory location that holds an object, by reference.
   * Re-assignment is the act of removing all previous values or pointers of a variable, and assigning it new data.
+  * LEARN DIFFERENCES BETWEEN VAR / LET, SPECIFICALLY ABOUT VAR'S HOISTING AS UNDEFINED
   
 #### Variable scope, especially how variables interact with function definitions and blocks
   * Variables declared with 'let' or 'const' have block scope. They can be accessed by all further nested inner blocks, but cannot be accessed by any outer block. A function definition (sometimes also called a function declaration or function statement) are followed by the function body which is denoted by curly braces ({ }) any variable declared within a function body, will only be accessible while the function is running. However, a variable can be declared outside of the function body in an outer scope, as all variables declared in an outer scope, will be accessible by inner scopes.
@@ -131,21 +132,160 @@
 
 
 #### Working with objects; accessing keys and values of an Object as arrays
-#### Arrays are objects
-#### Understand the concepts of pass-by-reference and pass-by-value
-* Primitive parameters (such as a number) are passed to functions by value; the value is passed to the function, but if the function changes the value of the parameter, this change is not reflected globally or in the calling function.
+  * Objects can be accessed using their key/property name. If the value of that key/property name is an array, the array must be further accessed using bracket notation.
+  * Objects have various built in methods that can be used to get and manipulate data. If we want to utilize the built in methods for Arrays, we first must convert either the keys, values, or entries, into an array.
+    * Object.keys(obj) will return an array of all the key values for a given object. This can then be further acted upon by built in Array methods.
+    * Object.values(obj) will return an array of all enumerable property values of the object.
+    * Object.entries(obj) will return an array of all key/value entries, with each key/value pair contained within their own array. [['key', 'value']]
 
-* If you pass an object (i.e. a non-primitive value, such as Array or a user-defined object) as a parameter and the function changes the object's properties, that change is visible outside the function, as shown in the following example:
-#### Variables as pointers
+#### Arrays are objects (?)
+  * Arrays can be considered a special type of object. The typeof operator will return 'object' for arrays. 
+  
+#### Understand the concepts of pass-by-reference and pass-by-value
+  * Primitive parameters (such as a number) are passed to functions by value; the value is passed to the function, but if the function changes the value of the parameter, this change is not reflected globally or in the calling function.
+  * If you pass an object (i.e. a non-primitive value, such as Array or a user-defined object) as a parameter and the function changes the object's properties, that change is visible outside the function, as shown in the following example:
+  * In essence, primitive values are considered pass by value, whereas objects and arrays are passed by reference.
+  
+#### Variables as pointers / references
+  * We use the term pointers and references interchangeably in JavaScript.
+  * Some variables will point/reference a place in memory that stores an Object/Array.
+    * When declaring a variable, a memory address is assigned to that variable. Every time that code runs, a new variable will be created. JavaScript removes old and unused variables.
+      * In the case of a primitive value, it can be thought of that the value itself is located at that memory address. That is to say, we follow 1 reference/pointer to get the value of the primitive value.
+      * When dealing with objects, the variable is assigned a memory address, which in turn has a value, which is another memory address _instead_ of the value. Located at the second memory address, is finally the value of the object.
+  * FOR THE TEST: VARIABLES ARE A NAME FOR ONE OF TWO THINGS, A PRIMITIVE VALUE, OR A POINTER/REFERENCE TO AN OBJECT.
+  
 #### Console.log vs return
+  * Console.log is used to print something to the console. Return is used to pass values throughout the program. 
+  
 #### Truthiness vs. boolean
+  * There are the primitive data type of boolean, which is either 'true' or 'false', and then there are values that are either 'truthy values' or 'falsy values' I.E. a value that javascript considers true or false in terms of conditionals.
+  * All values in JavaScript are truthy values, except for:
+    * (false)
+    * null
+    * undefined
+    * 0
+    * -0
+    * 0n (0 big int)
+    * NaN
+    * '' or ""
+  
 #### Function definition and invocation
+  * Before a function can be used, it must be defined. 
+  * Function invocation, is the act of calling the function after it's been defined. (There may be some semantically differences between calling a function and invoking a function (direct vs indirect) but I doubt I need to be aware of that for the assessment)
+  * Three ways to define a function are below
+
 #### Function declarations, function expressions, and arrow functions
+  * Function Declaration:
+    ```
+    function functionName(zeroOrMoreArguments) {
+      // You can call function declarations before you declare
+      // them, due to hoisting
+    }
+    ``` 
+    * Any function definition that doesn't have 'function' at the start, is a function expression! even:
+      ```
+      (function functionName() {
+        //this is a function expression NOT a function declaration
+      });
+      ```
+  * Function Expressions:
+    ```
+    let functionName = function(zeroOrMoreArguments) {
+      // Function Expressions are NOT hoisted
+      // and cannot be used before being defined
+    }
+    ``` 
+    * Functions that take functions as an argument, or return functions, are called higher order functions. The function being returned is a function expression.
+      ```
+      function functionDeclaration(arg) {
+        return function functionExpression() {
+          console.log(arg);
+        };
+      }
+      ```
+  * Arrow Functions:
+    ```
+    let greetPeople = () => console.log("Good Morning!");
+    ```
+    * Arrow functions are similar to function expressions with two main differences:
+      * Syntax
+      * Implicit returns:
+        * When the function body contains only a single expression (sub-expressions are allowed, but it must evaluate into one value)
+          * Remember, in general, expressions are pieces of code that evaluate to a value.
+  * Notes: For Test, do we need to know about anonymous functions?
+    * 'The variable the function expression is assigned to will have a name property. The name doesn't change if it's assigned to a different variable. If function name is omitted, it will be the variable name (implicit name). If function name is present, it will be the function name (explicit name). This also applies to arrow functions (arrows don't have a name so you can only give the variable an implicit name).'
+
 #### Implicit return value of function invocations
+  * All functions will return undefined, regardless of if the return statement is used. Whether or not the program even uses the return value of a function is a different matter entirely.
+  * Arrow functions implicitly return functions with only one expression.
+  * Functions either return a value, or have a side effect. (Or both)
+  
 #### First-class functions
+  * In JavaScript, all functions are first class functions, this means that functions can be treated just like any other variable, they can be passed to other functions, they can be returned from other functions.
+    * If the function is being passed in as an argument, it's called a 'callback function'.
+  * Functions that take other functions as arguments OR/AND return other functions, are called 'Higher-Order Functions'
+
 #### Side-effects
+  * Side effects are anything that happens by a function other than returning a value. 
+  * A Side Effect changes the state of the program outside of the function.
+    * A list of potential Side Effects:
+      * Modifying any external variable or object property (e.g., a global variable, or a variable in the parent function scope chain)
+      * Logging to the console
+      * Writing to the screen
+      * Writing to a file
+      * Writing to the network
+      * Triggering any external process
+      * Calling any other functions with side-effects
+
 #### Naming conventions (legal vs idiomatic)
+  * A legal name is any name that JavaScript will accept as a valid name.
+  * An idiomatic name, is a name that follows JavaScript standard naming practices.
+    * Idiomatic naming practices:
+      * camelCase
+        * variables
+        * functions
+      * snake_case
+      * SCREAMING_SNAKE_CASE
+        * constants
+
 #### Be able to explain what a function does without talking about its implementation; that is, document a function's use and purpose.
 
 ## Resources
-  [Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions)
+  * [Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions)
+  * [Hoisting](https://developer.mozilla.org/en-US/docs/Glossary/Hoisting)
+  * [First_Class_Functions](https://developer.mozilla.org/en-US/docs/Glossary/First-class_Function)
+  * [Callback_Function](https://developer.mozilla.org/en-US/docs/Glossary/Callback_function)
+  * QUESTIONS FOR STUDY SESSION:
+    * 1. What is the best way to label a methods parameter that is purposefully not being used. For example, if you had decided to use .filter((element, index) => {}) but you only planned to use the index parameter. Is '_element' standard?
+  * [var](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/var)
+
+* written exam
+  * highly focused on the theory
+* questions
+* code snippets, why it does so
+* whats the underlying concept behind the code snippet
+* what it does, why it does, find the concept behind it
+  * Expects a high level or percious
+    * It outputs this
+    * It returns that
+    * It mutates or doesn't mutate
+    * returns a new object, etc
+* 3 hours, 20 questions 
+
+* Interview 
+  * code challenge
+  * 2 problems, one after the other (in an hour)
+    * while explaining your thought process and using pedac
+      * PRACTICE live coding
+      * Try recording yourself if you can't do study sessions 
+      * CAMERA OFF FOR EVERYONE
+      * 
+    * works on coderpad and zoom
+    * Interviewer will mostly remain quiet
+      * You can ask questions
+        * clarifying questions
+        * "assume all numbers will be positive?"
+        * Ask only about the problems, NOT how to solve them
+  * should be able to solve a medium JS exercise in about 20 minutes to be ready
+  * VARIABLE SHADOWING??
+  * FOR OF LOOPS
