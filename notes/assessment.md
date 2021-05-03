@@ -33,6 +33,17 @@
   * Assignment is the act of attaching either a primitive data type to a variable by value, or a pointer to a memory location that holds an object, by reference.
   * Re-assignment is the act of removing all previous values or pointers of a variable, and assigning it new data.
   * LEARN DIFFERENCES BETWEEN VAR / LET, SPECIFICALLY ABOUT VAR'S HOISTING AS UNDEFINED
+  * While variables declared with var keyword are hoisted (initialized with undefined before the code is run) which means they are accessible in their enclosing scope even before they are declared
+  * [hoisting](https://dev.to/godcrampy/the-secret-of-hoisting-in-javascript-egi)
+  ```javascript
+a = 10;
+
+console.log(a);
+// Reference Error
+
+let a = 5; 
+```
+  * var and let and const are all hoisted, but let and const go into a temporal deadzone, where they are declared, but not initialized. var gets hoisted AND initialized with undefined
   
 #### Variable scope, especially how variables interact with function definitions and blocks
   * Variables declared with 'let' or 'const' have block scope. They can be accessed by all further nested inner blocks, but cannot be accessed by any outer block. A function definition (sometimes also called a function declaration or function statement) are followed by the function body which is denoted by curly braces ({ }) any variable declared within a function body, will only be accessible while the function is running. However, a variable can be declared outside of the function body in an outer scope, as all variables declared in an outer scope, will be accessible by inner scopes.
@@ -65,6 +76,7 @@
     * Properties are essentially variables that are associated with that specific object.
 
   * [Type Coercion](https://developer.mozilla.org/en-US/docs/Glossary/Type_coercion)
+
     * Type Coercion can happen both implicitly, and explicitly. It is the act of changing a values data type, into a different data type. For example, 1, is a number, '1' is a string.
     * There are various ways that Type Coercion can occur in JavaScript implicitly such as on operands being acted upon by an operator.
     * It is generally considered best practice to avoid implicit type coercion.
@@ -176,27 +188,27 @@
 
 #### Function declarations, function expressions, and arrow functions
   * Function Declaration:
-    ```
+    ```javascript
     function functionName(zeroOrMoreArguments) {
       // You can call function declarations before you declare
       // them, due to hoisting
     }
-    ``` 
+    ```
     * Any function definition that doesn't have 'function' at the start, is a function expression! even:
-      ```
+      ```javascript
       (function functionName() {
         //this is a function expression NOT a function declaration
       });
       ```
   * Function Expressions:
-    ```
+    ```javascript
     let functionName = function(zeroOrMoreArguments) {
       // Function Expressions are NOT hoisted
       // and cannot be used before being defined
     }
     ``` 
     * Functions that take functions as an argument, or return functions, are called higher order functions. The function being returned is a function expression.
-      ```
+      ```javascript
       function functionDeclaration(arg) {
         return function functionExpression() {
           console.log(arg);
@@ -204,7 +216,7 @@
       }
       ```
   * Arrow Functions:
-    ```
+    ```javascript
     let greetPeople = () => console.log("Good Morning!");
     ```
     * Arrow functions are similar to function expressions with two main differences:
@@ -265,7 +277,7 @@
 * code snippets, why it does so
 * whats the underlying concept behind the code snippet
 * what it does, why it does, find the concept behind it
-  * Expects a high level or percious
+  * Expects a high level or precision
     * It outputs this
     * It returns that
     * It mutates or doesn't mutate
@@ -289,3 +301,8 @@
   * should be able to solve a medium JS exercise in about 20 minutes to be ready
   * VARIABLE SHADOWING??
   * FOR OF LOOPS
+
+
+MARKDOWN TEST 
+
+  10 COMEBACK

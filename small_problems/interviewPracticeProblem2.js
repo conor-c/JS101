@@ -18,4 +18,6 @@ All array elements will be unique and the array will be sorted.
 // console.log(progressions([1, 2, 3, 4, 5]));    // 4
 // console.log(progressions([0, 5, 8, 9, 11, 13, 14, 16, 17, 19])); // 10
 
-
+function progressions(array) {
+  
+}
