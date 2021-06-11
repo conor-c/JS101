@@ -1,6 +1,6 @@
 // return true if portion of str1 can be matched to create str2
 // for the first letter in str2, see if there is a matching letter in str1
-// if there is, remove the matchedl etter from str1, move onto next str2 letter
+// if there is, remove the matched letter from str1, move onto next str2 letter
 
 function scramble(str1, str2) {
   let letterPool = str1.split('');
